@@ -2,8 +2,6 @@
 #include <vector>
 
 namespace HeapSort {
-	template<class RandomIt>
-	void Sort(RandomIt first, RandomIt last);
 	template<typename IntType>
 	bool HasChildren(IntType root, IntType bottom) {
 		//Return if a left child exists

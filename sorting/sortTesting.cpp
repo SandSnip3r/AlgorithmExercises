@@ -2,6 +2,7 @@
 #include <chrono>
 #include <vector>
 #include "heapsort.hpp"
+#include "quicksort.hpp"
 #include "timeUtility.hpp"
 
 using namespace std;
@@ -10,23 +11,35 @@ void CreateRandomData(vector<int> *numbers, int dataLength, pair<int,int> dataRa
 
 int main() {
 	for (int dataLength : { 10, 100, 1000, 10000, 100000, 1000000, 10000000 }) {
-		for (pair<int,int> dataRange : { 	pair<int,int>{1,10},
+		for (pair<int,int> dataRange : { 	pair<int,int>{1,2},
+																			pair<int,int>{1,10}, 
 																			pair<int,int>{1,100}, 
 																			pair<int,int>{1,1000}, 
 																			pair<int,int>{1,1000000} }) {
-
 			vector<int> numbers;
-			typedef chrono::nanoseconds DurationType;
-			DurationType duration;
-
 			CreateRandomData(&numbers, dataLength, dataRange);
+			typedef chrono::nanoseconds DurationType;
+			
+			DurationType heapsortDuration;
 			{
-				Timer<DurationType> timer(&duration);
-				HeapSort::Sort(numbers.begin(), numbers.end());
+				vector<int> heapsortTempNumbers(numbers);
+				Timer<DurationType> timer(&heapsortDuration);
+				HeapSort::Sort(heapsortTempNumbers.begin(), heapsortTempNumbers.end());
+				//Timer's destruction will set duration
+			}
+			
+			DurationType quicksortDuration;
+			{
+				vector<int> quicksortTempNumbers(numbers);
+				Timer<DurationType> timer(&quicksortDuration);
+				QuickSort::Sort(quicksortTempNumbers.begin(), quicksortTempNumbers.end());
 				//Timer's destruction will set duration
 			}
 
-			printf("Sorting a list, Length:%-8d, Range: [%d,%-7d], Time: %.8lf seconds\n",dataLength, dataRange.first, dataRange.second, chrono::duration_cast<chrono::duration<double>>(duration).count());
+			printf("List length:%d, range: [%d,%d]\n",dataLength, dataRange.first, dataRange.second);
+			printf("    Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapsortDuration).count());
+			printf("    Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quicksortDuration).count());
+			cout << endl;
 		}
 	}
 
