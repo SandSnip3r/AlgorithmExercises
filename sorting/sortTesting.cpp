@@ -9,7 +9,7 @@ using namespace std;
 void CreateRandomData(vector<int> *numbers, int dataLength, pair<int,int> dataRange);
 
 int main() {
-	for (int dataLength : { 10, 100, 1000, 10000, 100000, 1000000 }) {
+	for (int dataLength : { 10, 100, 1000, 10000, 100000, 1000000, 10000000 }) {
 		for (pair<int,int> dataRange : { 	pair<int,int>{1,10},
 																			pair<int,int>{1,100}, 
 																			pair<int,int>{1,1000}, 
@@ -26,7 +26,7 @@ int main() {
 				//Timer's destruction will set duration
 			}
 
-			printf("Sorting a list, Length:%-7d, Range: [%d,%-7d], Time: %9lu nanoseconds\n",dataLength, dataRange.first, dataRange.second, duration.count());
+			printf("Sorting a list, Length:%-8d, Range: [%d,%-7d], Time: %.8lf seconds\n",dataLength, dataRange.first, dataRange.second, chrono::duration_cast<chrono::duration<double>>(duration).count());
 		}
 	}
 
