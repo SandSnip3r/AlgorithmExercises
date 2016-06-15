@@ -9,23 +9,24 @@ using namespace std;
 void CreateRandomData(vector<int> *numbers, int dataLength, pair<int,int> dataRange);
 
 int main() {
-	for (int dataLength : { 10, 100, 1000, 10000 }) {
+	for (int dataLength : { 10, 100, 1000, 10000, 100000, 1000000 }) {
 		for (pair<int,int> dataRange : { 	pair<int,int>{1,10},
 																			pair<int,int>{1,100}, 
 																			pair<int,int>{1,1000}, 
 																			pair<int,int>{1,1000000} }) {
 
 			vector<int> numbers;
-			CreateRandomData(&numbers, dataLength, dataRange);
+			typedef chrono::nanoseconds DurationType;
+			DurationType duration;
 
-			chrono::nanoseconds duration;
+			CreateRandomData(&numbers, dataLength, dataRange);
 			{
-				Timer timer(&duration);
+				Timer<DurationType> timer(&duration);
 				HeapSort::Sort(numbers.begin(), numbers.end());
 				//Timer's destruction will set duration
 			}
 
-			printf("Sorting a list, Length:%-5d, Range: [%d,%-7d], Time: %9lu nanoseconds\n",dataLength, dataRange.first, dataRange.second, duration.count());
+			printf("Sorting a list, Length:%-7d, Range: [%d,%-7d], Time: %9lu nanoseconds\n",dataLength, dataRange.first, dataRange.second, duration.count());
 		}
 	}
 

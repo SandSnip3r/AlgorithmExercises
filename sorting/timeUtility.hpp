@@ -1,14 +1,15 @@
 #include <chrono>
 #include <iostream>
 
+template<class DurationType>
 class Timer {
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> start;
-	std::chrono::nanoseconds *duration;
+	DurationType *duration;
 public:
-	Timer(std::chrono::nanoseconds *dur) : start(std::chrono::high_resolution_clock::now()), duration(dur) {};
+	Timer(DurationType *dur) : start(std::chrono::high_resolution_clock::now()), duration(dur) {};
 	~Timer() {
 		auto end = std::chrono::high_resolution_clock::now();
-		*duration = end - start;
+		*duration = std::chrono::duration_cast<DurationType>(end - start);
 	}
 };
