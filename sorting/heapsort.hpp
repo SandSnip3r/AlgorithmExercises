@@ -2,29 +2,35 @@
 #include <vector>
 
 namespace HeapSort {
-	template<typename IntType>
-	bool HasChildren(IntType root, IntType bottom) {
+	template<typename RandomIt>
+	bool HasChildren(RandomIt first, RandomIt root, RandomIt last) {
 		//Return if a left child exists
-		return (root*2 + 1) <= bottom;
+		auto rootPos = std::distance(first, root);
+		auto length = std::distance(first, last)-1;
+		return (rootPos*2 + 1) <= length;
 	}
 
-	template<class RandomIt, typename IntType>
-	void HeapifyDown(RandomIt first, IntType root, IntType bottom) {
-		while (HasChildren(root, bottom)) {
+	template<class RandomIt>
+	void HeapifyDown(RandomIt first, RandomIt root, RandomIt last) {
+		while (HasChildren(first, root, last)) {
 			//Sift down until we reach a childless node
-			auto maxChild = root * 2 + 1;
+			auto rootPos = std::distance(first, root);
 			//Left child definitely exists, check if right child does
-			auto rightChildPos = root * 2 + 2;
-			if (rightChildPos <= bottom) {
+			auto leftChildPos = rootPos * 2 + 1;
+			auto rightChildPos = leftChildPos + 1;
+			bool rightChildIsBigger = false;
+			if (std::distance(first+rightChildPos, last) > 0) {
 				//Check if right child is bigger
-				if (*(first+rightChildPos) > *(first+maxChild)) {
-					maxChild = rightChildPos;
+				if (*(first+rightChildPos) > *(first+leftChildPos)) {
+					rightChildIsBigger = true;
 				}
 			}
+			auto maxChildPos = (rightChildIsBigger ? rightChildPos : leftChildPos);
+			RandomIt maxChild = first + maxChildPos;
 			//Now we have the greatest child, check if it's larger than the root
-			if (*(first+root) < *(first+maxChild)) {
+			if (*root < *maxChild) {
 				//Child is bigger, swap them
-				std::iter_swap((first+root), (first+maxChild));
+				std::iter_swap(root, maxChild);
 				//Set the root now to that child
 				root = maxChild;
 			} else {
@@ -39,7 +45,7 @@ namespace HeapSort {
 		auto length = std::distance(first, last);
 		//Element at (length/2 - 1) is guaranteed to be the last node with children
 		for (auto i=(length/2)-1; i>=0; --i) {
-			HeapifyDown(first, i, length-1);
+			HeapifyDown(first, first+i, last);
 		}
 	}
 
@@ -47,14 +53,13 @@ namespace HeapSort {
 	void Sort(RandomIt first, RandomIt last) {
 		Heapify(first, last);
 
-		auto endPos = std::distance(first, last) - 1;
-		while (endPos >= 0) {
+		while (std::distance(first, last) > 0) {
 			//Top of the heap is the greatest, swap it with the back
-			std::iter_swap(first, first+endPos);
+			std::iter_swap(first, last-1);
 			//Step the back down one because that element is now in the sorted position
-			--endPos;
+			--last;
 			//Now heapify down the new root element
-			HeapifyDown(first, 0l, endPos);
+			HeapifyDown(first, first, last);
 		}
 	}
 }
