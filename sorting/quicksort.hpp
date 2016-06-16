@@ -28,8 +28,9 @@ namespace QuickSort {
 
 	template<class RandomIt>
 	RandomIt Partition(RandomIt first, RandomIt end) {
+		auto length = end-first;
 		RandomIt last = end - 1;
-		RandomIt middle = first + (end-first)/2;
+		RandomIt middle = first + length/2;
 		//For the pivot, use the median of the first, last, and middle element
 		auto pivot = *GetMedian(first, middle, last);
 		while (1) {

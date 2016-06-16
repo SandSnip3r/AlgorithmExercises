@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include "heapsort.hpp"
+#include "insertionsort.hpp"
 #include "quicksort.hpp"
 
 #ifndef _INTROSORT_HPP
@@ -13,9 +14,7 @@ namespace IntroSort {
 
 	template<class RandomIt, class SizeType>
 	void SortLimitedDepth(RandomIt first, RandomIt end, SizeType depthLimit) {
-		auto length = end-first;
-		if (length > 1) {
-			//At least 2 elements to sort
+		while ((end-first) > int(SortThreshold)) {
 			if (depthLimit == 0) {
 				//Hit our depth limit, do heapsort now
 				HeapSort::Sort(first,end);
@@ -24,8 +23,9 @@ namespace IntroSort {
 			--depthLimit;
 			//Didnt hit the depth limit yet, continue quicksort
 			RandomIt partition = QuickSort::Partition(first, end);
-			SortLimitedDepth(first, partition, depthLimit);
+			// SortLimitedDepth(first, partition, depthLimit);
 			SortLimitedDepth(partition, end, depthLimit);
+			end = partition;
 		}
 	}
 
@@ -34,6 +34,8 @@ namespace IntroSort {
 		auto length = end-first;
 		int maxDepth = 2 * static_cast<int>(log2(length));
 		SortLimitedDepth(first, end, maxDepth);
+		//This leaves unsorted chunks of no more than size 'SortThreshold'
+		InsertionSort::Sort(first,end);
 	}
 }
 

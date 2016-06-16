@@ -18,10 +18,7 @@ int main() {
 																			pair<int,int>{1,1000}, 
 																			pair<int,int>{1,1000000} }) {
 			vector<int> numbers;
-			for (int i=0; i<dataLength; ++i) {
-				numbers.emplace_back(i);
-			}
-			// CreateRandomData(&numbers, dataLength, dataRange);
+			CreateRandomData(&numbers, dataLength, dataRange);
 			typedef chrono::nanoseconds DurationType;
 			
 			vector<int> stdNumbers(numbers);
@@ -67,10 +64,15 @@ int main() {
 					//Timer's destruction will set duration
 				}
 				if (stdNumbers != introSortTempNumbers) {
+					for (auto i : introSortTempNumbers) {
+						cout << i << " ";
+					}
+					cout << endl;
 					throw runtime_error("intro sort failed!");
 				}
 			}
 			
+			/*// too slow
 			DurationType insertionSortDuration;
 			{
 				vector<int> insertionSortTempNumbers(numbers);
@@ -82,14 +84,14 @@ int main() {
 				if (stdNumbers != insertionSortTempNumbers) {
 					throw runtime_error("insertion sort failed!");
 				}
-			}
+			}*/
 
 			printf("List length:%d, range: [%d,%d]\n",dataLength, dataRange.first, dataRange.second);
 			printf("    std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdSortDuration).count());
 			printf("    Heap sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapSortDuration).count());
 			printf("    Quick sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quickSortDuration).count());
 			printf("    Intro sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introSortDuration).count());
-			printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
+			// printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
 			cout << endl;
 		}
 	}

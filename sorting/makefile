@@ -9,7 +9,7 @@ all: sortTesting
 sortTesting: sortTesting.o
 	$(CC) -o sortTesting sortTesting.o $(CFLAGS)
 
-sortTesting.o: sortTesting.cpp heapsort.hpp introsort.hpp quicksort.hpp timeUtility.hpp
+sortTesting.o: sortTesting.cpp heapsort.hpp insertionsort.hpp introsort.hpp quicksort.hpp timeUtility.hpp
 	$(CC) -c sortTesting.cpp $(CFLAGS)
 
 clean:
