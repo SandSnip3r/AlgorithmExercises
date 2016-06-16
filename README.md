@@ -3,3 +3,5 @@
 - C++
   - Heapsort
   - Quicksort
+  - Insertion sort
+  - Introsort
