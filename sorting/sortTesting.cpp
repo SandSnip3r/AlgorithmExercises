@@ -1,7 +1,7 @@
 #include <chrono>
 #include <vector>
 #include "heapsort.hpp"
-#include "insertionsort.hpp"
+#include "insertionSort.hpp"
 #include "introsort.hpp"
 #include "quicksort.hpp"
 #include "timeUtility.hpp"
@@ -29,42 +29,42 @@ int main() {
 				//Timer's destruction will set duration
 			}
 			
-			DurationType heapSortDuration;
+			DurationType heapsortDuration;
 			{
-				vector<int> heapSortTempNumbers(numbers);
+				vector<int> heapsortTempNumbers(numbers);
 				{
-					Timer<DurationType> timer(&heapSortDuration);
-					HeapSort::Sort(heapSortTempNumbers.begin(), heapSortTempNumbers.end());
+					Timer<DurationType> timer(&heapsortDuration);
+					Heapsort::Sort(heapsortTempNumbers.begin(), heapsortTempNumbers.end());
 					//Timer's destruction will set duration
 				}
-				if (stdNumbers != heapSortTempNumbers) {
+				if (stdNumbers != heapsortTempNumbers) {
 					throw runtime_error("heap sort failed!");
 				}
 			}
 			
-			DurationType quickSortDuration;
+			DurationType quicksortDuration;
 			{
-				vector<int> quickSortTempNumbers(numbers);
+				vector<int> quicksortTempNumbers(numbers);
 				{
-					Timer<DurationType> timer(&quickSortDuration);
-					QuickSort::Sort(quickSortTempNumbers.begin(), quickSortTempNumbers.end());
+					Timer<DurationType> timer(&quicksortDuration);
+					Quicksort::Sort(quicksortTempNumbers.begin(), quicksortTempNumbers.end());
 					//Timer's destruction will set duration
 				}
-				if (stdNumbers != quickSortTempNumbers) {
+				if (stdNumbers != quicksortTempNumbers) {
 					throw runtime_error("quick sort failed!");
 				}
 			}
 			
-			DurationType introSortDuration;
+			DurationType introsortDuration;
 			{
-				vector<int> introSortTempNumbers(numbers);
+				vector<int> introsortTempNumbers(numbers);
 				{
-					Timer<DurationType> timer(&introSortDuration);
-					IntroSort::Sort(introSortTempNumbers.begin(), introSortTempNumbers.end());
+					Timer<DurationType> timer(&introsortDuration);
+					Introsort::Sort(introsortTempNumbers.begin(), introsortTempNumbers.end());
 					//Timer's destruction will set duration
 				}
-				if (stdNumbers != introSortTempNumbers) {
-					for (auto i : introSortTempNumbers) {
+				if (stdNumbers != introsortTempNumbers) {
+					for (auto i : introsortTempNumbers) {
 						cout << i << " ";
 					}
 					cout << endl;
@@ -72,7 +72,7 @@ int main() {
 				}
 			}
 			
-			/*// too slow
+			// too slow
 			DurationType insertionSortDuration;
 			{
 				vector<int> insertionSortTempNumbers(numbers);
@@ -84,14 +84,14 @@ int main() {
 				if (stdNumbers != insertionSortTempNumbers) {
 					throw runtime_error("insertion sort failed!");
 				}
-			}*/
+			}
 
 			printf("List length:%d, range: [%d,%d]\n",dataLength, dataRange.first, dataRange.second);
-			printf("    std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdSortDuration).count());
-			printf("    Heap sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapSortDuration).count());
-			printf("    Quick sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quickSortDuration).count());
-			printf("    Intro sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introSortDuration).count());
-			// printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
+			printf("         std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdSortDuration).count());
+			printf("          Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapsortDuration).count());
+			printf("         Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quicksortDuration).count());
+			printf("         Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introsortDuration).count());
+			printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
 			cout << endl;
 		}
 	}

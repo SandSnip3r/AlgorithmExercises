@@ -2,13 +2,13 @@
 #include <algorithm>
 #include <vector>
 #include "heapsort.hpp"
-#include "insertionsort.hpp"
+#include "insertionSort.hpp"
 #include "quicksort.hpp"
 
 #ifndef _INTROSORT_HPP
 #define _INTROSORT_HPP 1
 
-namespace IntroSort {
+namespace Introsort {
 
   enum { SortThreshold = 16 };
 
@@ -17,12 +17,12 @@ namespace IntroSort {
 		while ((end-first) > int(SortThreshold)) {
 			if (depthLimit == 0) {
 				//Hit our depth limit, do heapsort now
-				HeapSort::Sort(first,end);
+				Heapsort::Sort(first,end);
 				return;
 			}
 			--depthLimit;
 			//Didnt hit the depth limit yet, continue quicksort
-			RandomIt partition = QuickSort::Partition(first, end);
+			RandomIt partition = Quicksort::Partition(first, end);
 			// SortLimitedDepth(first, partition, depthLimit);
 			SortLimitedDepth(partition, end, depthLimit);
 			end = partition;

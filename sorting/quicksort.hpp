@@ -4,7 +4,7 @@
 #ifndef _QUICKSORT_HPP
 #define _QUICKSORT_HPP 1
 
-namespace QuickSort {
+namespace Quicksort {
 	template<class RandomIt>
 	RandomIt GetMedian(RandomIt first, RandomIt middle, RandomIt last) {
 		if (middle == last) {
