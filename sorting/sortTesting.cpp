@@ -76,7 +76,7 @@ int main() {
 				vector<int> insertionSortTempNumbers(numbers);
 				{
 					Timer<DurationType> timer(&insertionSortDuration);
-					IntroSort::Sort(insertionSortTempNumbers.begin(), insertionSortTempNumbers.end());
+					InsertionSort::Sort(insertionSortTempNumbers.begin(), insertionSortTempNumbers.end());
 					//Timer's destruction will set duration
 				}
 				if (stdNumbers != insertionSortTempNumbers) {
