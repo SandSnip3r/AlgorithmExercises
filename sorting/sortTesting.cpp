@@ -41,7 +41,7 @@ int main() {
 					//Timer's destruction will set duration
 				}
 				if (stdNumbers != heapSortTempNumbers) {
-					throw runtime_error("heapsort failed!");
+					throw runtime_error("heap sort failed!");
 				}
 			}
 			
@@ -54,7 +54,7 @@ int main() {
 					//Timer's destruction will set duration
 				}
 				if (stdNumbers != quickSortTempNumbers) {
-					throw runtime_error("quicksort failed!");
+					throw runtime_error("quick sort failed!");
 				}
 			}
 			
@@ -67,15 +67,29 @@ int main() {
 					//Timer's destruction will set duration
 				}
 				if (stdNumbers != introSortTempNumbers) {
-					throw runtime_error("introsort failed!");
+					throw runtime_error("intro sort failed!");
+				}
+			}
+			
+			DurationType insertionSortDuration;
+			{
+				vector<int> insertionSortTempNumbers(numbers);
+				{
+					Timer<DurationType> timer(&insertionSortDuration);
+					IntroSort::Sort(insertionSortTempNumbers.begin(), insertionSortTempNumbers.end());
+					//Timer's destruction will set duration
+				}
+				if (stdNumbers != insertionSortTempNumbers) {
+					throw runtime_error("insertion sort failed!");
 				}
 			}
 
 			printf("List length:%d, range: [%d,%d]\n",dataLength, dataRange.first, dataRange.second);
 			printf("    std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdSortDuration).count());
-			printf("    Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapSortDuration).count());
-			printf("    Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quickSortDuration).count());
-			printf("    Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introSortDuration).count());
+			printf("    Heap sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapSortDuration).count());
+			printf("    Quick sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quickSortDuration).count());
+			printf("    Intro sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introSortDuration).count());
+			printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
 			cout << endl;
 		}
 	}
