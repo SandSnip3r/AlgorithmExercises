@@ -1,8 +1,10 @@
 #include <algorithm>
-#include <iostream>
 #include <vector>
 
-namespace QuickSort {
+#ifndef _QUICKSORT_HPP
+#define _QUICKSORT_HPP 1
+
+namespace Quicksort {
 	template<class RandomIt>
 	RandomIt GetMedian(RandomIt first, RandomIt middle, RandomIt last) {
 		if (middle == last) {
@@ -57,3 +59,5 @@ namespace QuickSort {
 		}
 	}
 }
+
+#endif //_QUICKSORT_HPP

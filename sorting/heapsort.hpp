@@ -1,25 +1,28 @@
 #include <algorithm>
 #include <vector>
 
-namespace HeapSort {
+#ifndef _HEAPSORT_HPP
+#define _HEAPSORT_HPP 1
+
+namespace Heapsort {
 	template<typename RandomIt>
-	bool HasChildren(RandomIt first, RandomIt root, RandomIt last) {
+	bool HasChildren(RandomIt first, RandomIt root, RandomIt end) {
 		//Return if a left child exists
 		auto rootPos = root - first;
-		auto length = last - first;
+		auto length = end - first;
 		return (rootPos*2 + 1) < length;
 	}
 
 	template<class RandomIt>
-	void HeapifyDown(RandomIt first, RandomIt root, RandomIt last) {
-		while (HasChildren(first, root, last)) {
+	void HeapifyDown(RandomIt first, RandomIt root, RandomIt end) {
+		while (HasChildren(first, root, end)) {
 			//Sift down until we reach a childless node
 			auto rootPos = root - first;
 			//Left child definitely exists, check if right child does
 			auto leftChildPos = rootPos * 2 + 1;
 			auto rightChildPos = leftChildPos + 1;
 			bool rightChildIsBigger = false;
-			if ((last - (first+rightChildPos)) > 0) {
+			if ((end - (first+rightChildPos)) > 0) {
 				//Check if right child is bigger
 				if (*(first+rightChildPos) > *(first+leftChildPos)) {
 					rightChildIsBigger = true;
@@ -41,24 +44,27 @@ namespace HeapSort {
 	}
 
 	template<class RandomIt>
-	void Heapify(RandomIt first, RandomIt last) {
-		auto length = (last - first);
+	void Heapify(RandomIt first, RandomIt end) {
+		auto length = (end - first);
 		//Element at (length/2 - 1) is guaranteed to be the last node with children
 		for (auto i=(length/2)-1; i>=0; --i) {
-			HeapifyDown(first, first+i, last);
+			HeapifyDown(first, first+i, end);
 		}
 	}
 
 	template<class RandomIt>
-	void Sort(RandomIt first, RandomIt last) {
-		Heapify(first, last);
-		while ((last - first) > 0) {
+	void Sort(RandomIt first, RandomIt end) {
+		Heapify(first, end);
+		while ((end - first) > 0) {
 			//Top of the heap is the greatest, swap it with the back
-			std::iter_swap(first, last-1);
+			auto last = end-1;
+			std::iter_swap(first, last);
 			//Step the back down one because that element is now in the sorted position
-			--last;
+			--end;
 			//Now heapify down the new root element
-			HeapifyDown(first, first, last);
+			HeapifyDown(first, first, end);
 		}
 	}
 }
+
+#endif //_HEAPSORT_HPP
