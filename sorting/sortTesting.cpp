@@ -1,4 +1,3 @@
-#include <cassert>
 #include <chrono>
 #include <vector>
 #include "heapsort.hpp"
@@ -11,7 +10,7 @@ void CreateRandomData(vector<int> *numbers, int dataLength, pair<int,int> dataRa
 
 int main() {
 	for (int dataLength : { 10, 100, 1000, 10000, 100000, 1000000, 10000000 }) {
-		for (pair<int,int> dataRange : { 	pair<int,int>{1,2},
+		for (pair<int,int> dataRange : { 	pair<int,int>{1,1},
 																			pair<int,int>{1,10}, 
 																			pair<int,int>{1,100}, 
 																			pair<int,int>{1,1000}, 
