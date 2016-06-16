@@ -1,6 +1,7 @@
 #include <chrono>
 #include <vector>
 #include "heapsort.hpp"
+#include "insertionsort.hpp"
 #include "introsort.hpp"
 #include "quicksort.hpp"
 #include "timeUtility.hpp"
@@ -31,50 +32,50 @@ int main() {
 				//Timer's destruction will set duration
 			}
 			
-			DurationType heapsortDuration;
+			DurationType heapSortDuration;
 			{
-				vector<int> heapsortTempNumbers(numbers);
+				vector<int> heapSortTempNumbers(numbers);
 				{
-					Timer<DurationType> timer(&heapsortDuration);
-					Heapsort::Sort(heapsortTempNumbers.begin(), heapsortTempNumbers.end());
+					Timer<DurationType> timer(&heapSortDuration);
+					HeapSort::Sort(heapSortTempNumbers.begin(), heapSortTempNumbers.end());
 					//Timer's destruction will set duration
 				}
-				if (stdNumbers != heapsortTempNumbers) {
+				if (stdNumbers != heapSortTempNumbers) {
 					throw runtime_error("heapsort failed!");
 				}
 			}
 			
-			DurationType quicksortDuration;
+			DurationType quickSortDuration;
 			{
-				vector<int> quicksortTempNumbers(numbers);
+				vector<int> quickSortTempNumbers(numbers);
 				{
-					Timer<DurationType> timer(&quicksortDuration);
-					Quicksort::Sort(quicksortTempNumbers.begin(), quicksortTempNumbers.end());
+					Timer<DurationType> timer(&quickSortDuration);
+					QuickSort::Sort(quickSortTempNumbers.begin(), quickSortTempNumbers.end());
 					//Timer's destruction will set duration
 				}
-				if (stdNumbers != quicksortTempNumbers) {
+				if (stdNumbers != quickSortTempNumbers) {
 					throw runtime_error("quicksort failed!");
 				}
 			}
 			
-			DurationType introsortDuration;
+			DurationType introSortDuration;
 			{
-				vector<int> introsortTempNumbers(numbers);
+				vector<int> introSortTempNumbers(numbers);
 				{
-					Timer<DurationType> timer(&introsortDuration);
-					Introsort::Sort(introsortTempNumbers.begin(), introsortTempNumbers.end());
+					Timer<DurationType> timer(&introSortDuration);
+					IntroSort::Sort(introSortTempNumbers.begin(), introSortTempNumbers.end());
 					//Timer's destruction will set duration
 				}
-				if (stdNumbers != introsortTempNumbers) {
+				if (stdNumbers != introSortTempNumbers) {
 					throw runtime_error("introsort failed!");
 				}
 			}
 
 			printf("List length:%d, range: [%d,%d]\n",dataLength, dataRange.first, dataRange.second);
 			printf("    std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdSortDuration).count());
-			printf("    Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapsortDuration).count());
-			printf("    Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quicksortDuration).count());
-			printf("    Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introsortDuration).count());
+			printf("    Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapSortDuration).count());
+			printf("    Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quickSortDuration).count());
+			printf("    Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introSortDuration).count());
 			cout << endl;
 		}
 	}

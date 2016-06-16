@@ -4,7 +4,7 @@
 #ifndef _HEAPSORT_HPP
 #define _HEAPSORT_HPP 1
 
-namespace Heapsort {
+namespace HeapSort {
 	template<typename RandomIt>
 	bool HasChildren(RandomIt first, RandomIt root, RandomIt end) {
 		//Return if a left child exists

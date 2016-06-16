@@ -7,7 +7,7 @@
 #ifndef _INTROSORT_HPP
 #define _INTROSORT_HPP 1
 
-namespace Introsort {
+namespace IntroSort {
 
   enum { SortThreshold = 16 };
 
@@ -18,12 +18,12 @@ namespace Introsort {
 			//At least 2 elements to sort
 			if (depthLimit == 0) {
 				//Hit our depth limit, do heapsort now
-				Heapsort::Sort(first,end);
+				HeapSort::Sort(first,end);
 				return;
 			}
 			--depthLimit;
 			//Didnt hit the depth limit yet, continue quicksort
-			RandomIt partition = Quicksort::Partition(first, end);
+			RandomIt partition = QuickSort::Partition(first, end);
 			SortLimitedDepth(first, partition, depthLimit);
 			SortLimitedDepth(partition, end, depthLimit);
 		}
