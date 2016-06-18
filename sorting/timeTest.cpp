@@ -1,6 +1,7 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include "bogosort.hpp"
 #include "heapsort.hpp"
 #include "insertionSort.hpp"
 #include "introsort.hpp"
@@ -21,6 +22,7 @@ void HeapsortTest(vector<int> numbers, DurationType *duration);
 void QuicksortTest(vector<int> numbers, DurationType *duration);
 void IntrosortTest(vector<int> numbers, DurationType *duration);
 void InsertionSortTest(vector<int> numbers, DurationType *duration);
+void BogosortTest(vector<int> numbers, DurationType *duration);
 
 int main() {
 	for (auto length : { 	1, 10, 100, 1000, 10000, 100000 }) {
@@ -38,12 +40,14 @@ int main() {
 			DurationType quicksortDuration;
 			DurationType introsortDuration;
 			DurationType insertionSortDuration;
+			DurationType bogosortDuration;
 
 			STDSortTest(numbers, &stdDuration);
 			HeapsortTest(numbers, &heapsortDuration);
 			QuicksortTest(numbers, &quicksortDuration);
 			IntrosortTest(numbers, &introsortDuration);
 			InsertionSortTest(numbers, &insertionSortDuration);
+			BogosortTest(numbers, &bogosortDuration);
 
 			printf("Length = %d & Range = [%d-%d]\n",length, dataRange.first, dataRange.last);
 			printf("         std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdDuration).count());
@@ -51,6 +55,7 @@ int main() {
 			printf("         Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quicksortDuration).count());
 			printf("         Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introsortDuration).count());
 			printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
+			printf("          Bogosort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(bogosortDuration).count());
 			cout << endl;
 		}
 	}
@@ -85,6 +90,12 @@ void IntrosortTest(vector<int> numbers, DurationType *duration) {
 void InsertionSortTest(vector<int> numbers, DurationType *duration) {
 	Timer<DurationType> timer(duration);
 	InsertionSort::Sort(numbers.begin(), numbers.end());
+	//Timer's destruction will set duration
+}
+
+void BogosortTest(vector<int> numbers, DurationType *duration) {
+	Timer<DurationType> timer(duration);
+	Bogosort::Sort(numbers.begin(), numbers.end());
 	//Timer's destruction will set duration
 }
 
