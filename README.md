@@ -11,3 +11,4 @@
     - Using C++ STL implementation
     - Quicksort is performed to a maximum depth given by 2×log2(n), then heapsort is done on any list longer than 16, finally an insertion sort pass
   - Bogosort
+    - Randomized
