@@ -32,7 +32,7 @@ int main() {
 																	DataRange{1,10}, 
 																	DataRange{1,100}, 
 																	DataRange{1,1000}, 
-																	DataRange{1,length*10} }) {
+																	DataRange{1,10000000} }) {
 			CreateRandomData(&numbers, length, dataRange);
 			
 			DurationType stdDuration;
@@ -70,33 +70,58 @@ void STDSortTest(vector<int> numbers, DurationType *duration) {
 }
 
 void HeapsortTest(vector<int> numbers, DurationType *duration) {
-	Timer<DurationType> timer(duration);
-	Heapsort::Sort(numbers.begin(), numbers.end());
-	//Timer's destruction will set duration
+	{
+		Timer<DurationType> timer(duration);
+		Heapsort::Sort(numbers.begin(), numbers.end());
+		//Timer's destruction will set duration
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Heapsort failed!");
+	}
 }
 
 void QuicksortTest(vector<int> numbers, DurationType *duration) {
-	Timer<DurationType> timer(duration);
-	Quicksort::Sort(numbers.begin(), numbers.end());
-	//Timer's destruction will set duration
+	{
+		Timer<DurationType> timer(duration);
+		Quicksort::Sort(numbers.begin(), numbers.end());
+		//Timer's destruction will set duration
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Quicksort failed!");
+	}
 }
 
 void IntrosortTest(vector<int> numbers, DurationType *duration) {
-	Timer<DurationType> timer(duration);
-	Introsort::Sort(numbers.begin(), numbers.end());
-	//Timer's destruction will set duration
+	{
+		Timer<DurationType> timer(duration);
+		Introsort::Sort(numbers.begin(), numbers.end());
+		//Timer's destruction will set duration
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Introsort failed!");
+	}
 }
 
 void InsertionSortTest(vector<int> numbers, DurationType *duration) {
-	Timer<DurationType> timer(duration);
-	InsertionSort::Sort(numbers.begin(), numbers.end());
-	//Timer's destruction will set duration
+	{
+		Timer<DurationType> timer(duration);
+		InsertionSort::Sort(numbers.begin(), numbers.end());
+		//Timer's destruction will set duration
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("InsertionSort failed!");
+	}
 }
 
 void BogosortTest(vector<int> numbers, DurationType *duration) {
-	Timer<DurationType> timer(duration);
-	Bogosort::Sort(numbers.begin(), numbers.end());
-	//Timer's destruction will set duration
+	{
+		Timer<DurationType> timer(duration);
+		Bogosort::Sort(numbers.begin(), numbers.end());
+		//Timer's destruction will set duration
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Bogosort failed!");
+	}
 }
 
 void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange) {
