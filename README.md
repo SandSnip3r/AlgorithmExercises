@@ -15,3 +15,4 @@
     - Removed from timeTest.cpp as it is horribly slow
       - Using randomization, given input of length `n` made of random numbers generated in the range `[a,b]`, the expected number of iterations is `(b-a+1)^n / ((b-a+1)+n choose (b-a+1))`
       - Ex. `length=100 & range=[1,10]`, expected number of iterations is `10^100 / (110 choose 10)` which equals `2.13 × 10^96`
+  - Bubble sort

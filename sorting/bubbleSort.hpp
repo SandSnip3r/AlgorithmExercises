@@ -6,15 +6,15 @@
 
 namespace BubbleSort {
 
-	template<class RandomIt>
-	void Sort(RandomIt first, RandomIt end) {
+	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
+	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
 		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
 		DiffType length = end-first;
 		DiffType firstInOrderPosition = length;
 		while (firstInOrderPosition > 0) {
 			unsigned newFirst = 0;
 			for (unsigned int i=1; i<firstInOrderPosition; ++i) {
-				if (*(first+(i-1)) > *(first+i)) {
+				if (Comp(*(first+i), *(first+(i-1)))) {
 					std::iter_swap(first+(i-1), first+i);
 					newFirst = i;
 				}
