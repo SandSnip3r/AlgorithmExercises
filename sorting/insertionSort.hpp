@@ -6,15 +6,15 @@
 
 namespace InsertionSort {
 
-	template<class RandomIt>
-	void Sort(RandomIt first, RandomIt end) {
+	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
+	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
 		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 		DiffType length = end-first;
 		for (unsigned int i=1; i<length; ++i) {
 			ValueType val = *(first+i);
 			int newPos = i-1;
-			while (*(first+newPos) > val && newPos >= 0) {
+			while (Comp(val, *(first+newPos)) && newPos >= 0) {
 				*(first+newPos+1) = *(first+newPos);
 				--newPos;
 			}
