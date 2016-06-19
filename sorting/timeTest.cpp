@@ -38,10 +38,9 @@ int main() {
 	//===========================Test a list already in order============================
 	for (auto length : { 100, 10000, 100000 }) {
 		vector<int> numbers;
-		numbers.reserve(length);
-		for (int i=0; i<length; ++i) {
-			numbers.emplace_back(i);
-		}
+		numbers.resize(length);
+		int i=0;
+		generate(numbers.begin(), numbers.end(), [&i]{ return i++; });
 
 		printf("Length = %d & in order\n",length);
 		TestSorts(numbers);
@@ -50,10 +49,9 @@ int main() {
 	//============================Test a list in reverse order===========================
 	for (auto length : { 100, 10000, 100000 }) {
 		vector<int> numbers;
-		numbers.reserve(length);
-		for (int i=0; i<length; ++i) {
-			numbers.emplace_back(length-i);
-		}
+		numbers.resize(length);
+		int i=length;
+		generate(numbers.begin(), numbers.end(), [&i]{ return --i; });
 
 		printf("Length = %d & in reverse order\n",length);
 		TestSorts(numbers);
@@ -109,10 +107,6 @@ void HeapsortTest(vector<int> numbers, DurationType *duration) {
 		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end(), ComparisonFuntion)) {
-		for (auto i:numbers) {
-			cout << i << " ";
-		}
-		cout << endl;
 		throw std::runtime_error("Heapsort failed!");
 	}
 }
@@ -153,7 +147,7 @@ void InsertionSortTest(vector<int> numbers, DurationType *duration) {
 void BogosortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
-		Bogosort::Sort(numbers.begin(), numbers.end());
+		Bogosort::Sort(numbers.begin(), numbers.end(), Bogosort::ShuffleType::Permute);
 		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {

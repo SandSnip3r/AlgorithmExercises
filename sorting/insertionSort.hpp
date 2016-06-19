@@ -8,9 +8,11 @@ namespace InsertionSort {
 
 	template<class RandomIt>
 	void Sort(RandomIt first, RandomIt end) {
-		typename std::iterator_traits<RandomIt>::difference_type length = end-first;
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		DiffType length = end-first;
 		for (unsigned int i=1; i<length; ++i) {
-			typename std::iterator_traits<RandomIt>::value_type val = *(first+i);
+			ValueType val = *(first+i);
 			int newPos = i-1;
 			while (*(first+newPos) > val && newPos >= 0) {
 				*(first+newPos+1) = *(first+newPos);
