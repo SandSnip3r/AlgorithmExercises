@@ -5,19 +5,20 @@
 #define _QUICKSORT_HPP 1
 
 namespace Quicksort {
-	template<class RandomIt>
-	RandomIt GetMedian(RandomIt first, RandomIt middle, RandomIt last) {
+	template<class RandomIt, class Compare>
+	RandomIt GetMedian(RandomIt first, RandomIt middle, RandomIt last, Compare Comp) {
+		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 		if (middle == last) {
 			//If there are 2 elements, there isnt really a middle
 			return last;
 		}
-		typename std::iterator_traits<RandomIt>::value_type firstValue = *first;
-		typename std::iterator_traits<RandomIt>::value_type middleValue = *middle;
-		typename std::iterator_traits<RandomIt>::value_type lastValue = *last;
-		if (firstValue <= middleValue && middleValue <= lastValue) {
+		ValueType firstValue = *first;
+		ValueType middleValue = *middle;
+		ValueType lastValue = *last;
+		if (!Comp(lastValue, middleValue) && !Comp(middleValue, firstValue)) {
 			//middle is the median
 			return middle;
-		} else if (middleValue <= firstValue && firstValue <= lastValue) {
+		} else if (!Comp(lastValue, firstValue) && !Comp(firstValue, middleValue)) {
 			//first is the median
 			return first;
 		} else {
@@ -26,18 +27,20 @@ namespace Quicksort {
 		}
 	}
 
-	template<class RandomIt>
-	RandomIt Partition(RandomIt first, RandomIt end) {
-		typename std::iterator_traits<RandomIt>::difference_type length = end-first;
+	template<class RandomIt, class Compare>
+	RandomIt Partition(RandomIt first, RandomIt end, Compare Comp) {
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		DiffType length = end-first;
 		RandomIt last = end - 1;
 		RandomIt middle = first + length/2;
 		//For the pivot, use the median of the first, last, and middle element
-		typename std::iterator_traits<RandomIt>::value_type pivot = *GetMedian(first, middle, last);
+		ValueType pivot = *GetMedian(first, middle, last, Comp);
 		while (1) {
-			while (*first < pivot) {
+			while (Comp(*first, pivot)) {
 				++first;
 			}
-			while (*last > pivot) {
+			while (Comp(pivot, *last)) {
 				--last;
 			}
 			if (last-first <= 0) {
@@ -49,14 +52,15 @@ namespace Quicksort {
 		}
 	}
 
-	template<class RandomIt>
-	void Sort(RandomIt first, RandomIt end) {
-		typename std::iterator_traits<RandomIt>::difference_type length = end-first;
+	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
+	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		DiffType length = end-first;
 		if (length > 1) {
 			//At least 2 elements to sort
-			RandomIt partition = Partition(first, end);
-			Sort(first, partition);
-			Sort(partition, end);
+			RandomIt partition = Partition(first, end, Comp);
+			Sort(first, partition, Comp);
+			Sort(partition, end, Comp);
 		}
 	}
 }
