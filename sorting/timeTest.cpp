@@ -16,7 +16,6 @@ struct DataRange {
 	int last;
 };
 
-void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange);
 void TestSorts(const vector<int> &numbers);
 void STDSortTest(vector<int> numbers, DurationType *duration);
 void HeapsortTest(vector<int> numbers, DurationType *duration);
@@ -24,6 +23,8 @@ void QuicksortTest(vector<int> numbers, DurationType *duration);
 void IntrosortTest(vector<int> numbers, DurationType *duration);
 void InsertionSortTest(vector<int> numbers, DurationType *duration);
 void BogosortTest(vector<int> numbers, DurationType *duration);
+bool ComparisonFuntion(const int &a, const int &b);
+void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange);
 
 int main() {
 	//====================Test a list where all numbers are identical====================
@@ -104,10 +105,14 @@ void STDSortTest(vector<int> numbers, DurationType *duration) {
 void HeapsortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
-		Heapsort::Sort(numbers.begin(), numbers.end());
+		Heapsort::Sort(numbers.begin(), numbers.end(), ComparisonFuntion);
 		//Timer's destruction will set duration
 	}
-	if (!is_sorted(numbers.begin(), numbers.end())) {
+	if (!is_sorted(numbers.begin(), numbers.end(), ComparisonFuntion)) {
+		for (auto i:numbers) {
+			cout << i << " ";
+		}
+		cout << endl;
 		throw std::runtime_error("Heapsort failed!");
 	}
 }
@@ -154,6 +159,10 @@ void BogosortTest(vector<int> numbers, DurationType *duration) {
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Bogosort failed!");
 	}
+}
+
+bool ComparisonFuntion(const int &a, const int &b) {
+	return a < b;
 }
 
 void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange) {

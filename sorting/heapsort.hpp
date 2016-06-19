@@ -8,30 +8,32 @@ namespace Heapsort {
 	template<typename RandomIt>
 	bool HasChildren(RandomIt first, RandomIt root, RandomIt end) {
 		//Return if a left child exists
-		typename std::iterator_traits<RandomIt>::difference_type rootPos = root - first;
-		typename std::iterator_traits<RandomIt>::difference_type length = end - first;
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		DiffType rootPos = root - first;
+		DiffType length = end - first;
 		return (rootPos*2 + 1) < length;
 	}
 
-	template<class RandomIt>
-	void HeapifyDown(RandomIt first, RandomIt root, RandomIt end) {
+	template<class RandomIt, class Compare>
+	void HeapifyDown(RandomIt first, RandomIt root, RandomIt end, Compare Comp) {
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
 		while (HasChildren(first, root, end)) {
 			//Sift down until we reach a childless node
-			typename std::iterator_traits<RandomIt>::difference_type rootPos = root - first;
+			DiffType rootPos = root - first;
 			//Left child definitely exists, check if right child does
-			typename std::iterator_traits<RandomIt>::difference_type leftChildPos = rootPos * 2 + 1;
-			typename std::iterator_traits<RandomIt>::difference_type rightChildPos = leftChildPos + 1;
+			DiffType leftChildPos = rootPos * 2 + 1;
+			DiffType rightChildPos = leftChildPos + 1;
 			bool rightChildIsBigger = false;
 			if ((end - (first+rightChildPos)) > 0) {
-				//Check if right child is bigger
-				if (*(first+rightChildPos) > *(first+leftChildPos)) {
+				//Right child exists, check if it is bigger
+				if (Comp(*(first+leftChildPos), *(first+rightChildPos))) {
 					rightChildIsBigger = true;
 				}
 			}
-			typename std::iterator_traits<RandomIt>::difference_type maxChildPos = (rightChildIsBigger ? rightChildPos : leftChildPos);
+			DiffType maxChildPos = (rightChildIsBigger ? rightChildPos : leftChildPos);
 			RandomIt maxChild = first + maxChildPos;
 			//Now we have the greatest child, check if it's larger than the root
-			if (*root < *maxChild) {
+			if (Comp(*root,*maxChild)) {
 				//Child is bigger, swap them
 				std::iter_swap(root, maxChild);
 				//Set the root now to that child
@@ -43,18 +45,19 @@ namespace Heapsort {
 		}
 	}
 
-	template<class RandomIt>
-	void Heapify(RandomIt first, RandomIt end) {
-		typename std::iterator_traits<RandomIt>::difference_type length = (end - first);
+	template<class RandomIt, class Compare>
+	void Heapify(RandomIt first, RandomIt end, Compare Comp) {
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		DiffType length = (end - first);
 		//Element at (length/2 - 1) is guaranteed to be the last node with children
-		for (typename std::iterator_traits<RandomIt>::difference_type i=(length/2)-1; i>=0; --i) {
-			HeapifyDown(first, first+i, end);
+		for (DiffType i=(length/2)-1; i>=0; --i) {
+			HeapifyDown(first, first+i, end, Comp);
 		}
 	}
 
-	template<class RandomIt>
-	void Sort(RandomIt first, RandomIt end) {
-		Heapify(first, end);
+	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
+	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
+		Heapify(first, end, Comp);
 		while ((end - first) > 0) {
 			//Top of the heap is the greatest, swap it with the back
 			RandomIt last = end-1;
@@ -62,7 +65,7 @@ namespace Heapsort {
 			//Step the back down one because that element is now in the sorted position
 			--end;
 			//Now heapify down the new root element
-			HeapifyDown(first, first, end);
+			HeapifyDown(first, first, end, Comp);
 		}
 	}
 }
