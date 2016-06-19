@@ -27,7 +27,7 @@ void BogosortTest(vector<int> numbers, DurationType *duration);
 
 int main() {
 	//====================Test a list where all numbers are identical====================
-	for (auto length : { 	100, 10000, 100000 }) {
+	for (auto length : { 100, 10000, 100000 }) {
 		vector<int> numbers(length,1);
 
 		printf("Length = %d & all identical\n",length);
@@ -35,7 +35,7 @@ int main() {
 	}
 	
 	//===========================Test a list already in order============================
-	for (auto length : { 	100, 10000, 100000 }) {
+	for (auto length : { 100, 10000, 100000 }) {
 		vector<int> numbers;
 		numbers.reserve(length);
 		for (int i=0; i<length; ++i) {
@@ -47,7 +47,7 @@ int main() {
 	}
 	
 	//============================Test a list in reverse order===========================
-	for (auto length : { 	100, 10000, 100000 }) {
+	for (auto length : { 100, 10000, 100000 }) {
 		vector<int> numbers;
 		numbers.reserve(length);
 		for (int i=0; i<length; ++i) {
@@ -59,7 +59,7 @@ int main() {
 	}
 
 	//=============================Test some random numbers==============================
-	for (auto length : { 	10, 100, 1000, 10000, 100000 }) {
+	for (auto length : { 10, 100, 1000, 10000, 100000 }) {
 		vector<int> numbers;
 		numbers.reserve(length);
 		for (DataRange dataRange : { 	DataRange{1,10}, 
@@ -77,23 +77,20 @@ int main() {
 }
 
 void TestSorts(const vector<int> &numbers) {
-	DurationType stdDuration;
-	DurationType heapsortDuration;
-	DurationType quicksortDuration;
-	DurationType introsortDuration;
-	DurationType insertionSortDuration;
+	DurationType duration;
 
-	STDSortTest(numbers, &stdDuration);
-	HeapsortTest(numbers, &heapsortDuration);
-	QuicksortTest(numbers, &quicksortDuration);
-	IntrosortTest(numbers, &introsortDuration);
-	InsertionSortTest(numbers, &insertionSortDuration);
-
-	printf("         std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdDuration).count());
-	printf("          Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(heapsortDuration).count());
-	printf("         Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quicksortDuration).count());
-	printf("         Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introsortDuration).count());
-	printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
+	STDSortTest(numbers, &duration);
+	printf("         std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	HeapsortTest(numbers, &duration);
+	printf("          Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	QuicksortTest(numbers, &duration);
+	printf("         Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	IntrosortTest(numbers, &duration);
+	printf("         Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	InsertionSortTest(numbers, &duration);
+	printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	BogosortTest(numbers, &duration);
+	printf("          Bogosort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	cout << endl;
 
 }
