@@ -16,7 +16,7 @@ namespace MergeSort {
 				return;
 			} else {
 				//Need to do a rotate
-				//	This moves 'middle' to the position of first,
+				//	This moves 'middle' to the position of 'first',
 				//	and shifts [first, middle) to the right one
 				std::rotate(first, middle, middle+1);
 				++first;
