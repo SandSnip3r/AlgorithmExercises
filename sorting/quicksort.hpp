@@ -11,9 +11,9 @@ namespace Quicksort {
 			//If there are 2 elements, there isnt really a middle
 			return last;
 		}
-		auto firstValue = *first;
-		auto middleValue = *middle;
-		auto lastValue = *last;
+		typename std::iterator_traits<RandomIt>::value_type firstValue = *first;
+		typename std::iterator_traits<RandomIt>::value_type middleValue = *middle;
+		typename std::iterator_traits<RandomIt>::value_type lastValue = *last;
 		if (firstValue <= middleValue && middleValue <= lastValue) {
 			//middle is the median
 			return middle;
@@ -28,11 +28,11 @@ namespace Quicksort {
 
 	template<class RandomIt>
 	RandomIt Partition(RandomIt first, RandomIt end) {
-		auto length = end-first;
+		typename std::iterator_traits<RandomIt>::difference_type length = end-first;
 		RandomIt last = end - 1;
 		RandomIt middle = first + length/2;
 		//For the pivot, use the median of the first, last, and middle element
-		auto pivot = *GetMedian(first, middle, last);
+		typename std::iterator_traits<RandomIt>::value_type pivot = *GetMedian(first, middle, last);
 		while (1) {
 			while (*first < pivot) {
 				++first;
@@ -51,7 +51,7 @@ namespace Quicksort {
 
 	template<class RandomIt>
 	void Sort(RandomIt first, RandomIt end) {
-		auto length = end-first;
+		typename std::iterator_traits<RandomIt>::difference_type length = end-first;
 		if (length > 1) {
 			//At least 2 elements to sort
 			RandomIt partition = Partition(first, end);
