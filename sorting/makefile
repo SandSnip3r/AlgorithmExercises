@@ -9,8 +9,8 @@ all: timeTest
 timeTest: timeTest.o
 	$(CC) -o timeTest timeTest.o $(CFLAGS)
 
-timeTest.o: bogosort.hpp heapsort.hpp insertionSort.hpp introsort.hpp quicksort.hpp timeTest.cpp timeUtility.hpp
-	$(CC) -c timeTest.cpp $(CFLAGS)
+timeTest.o: bogosort.hpp heapsort.hpp insertionSort.hpp introsort.hpp quicksort.hpp timeTest.cpp ../utilites/timeUtility.hpp
+	$(CC) -c timeTest.cpp -I../utilites/ $(CFLAGS)
 
 clean:
 	$(RM) *.o
