@@ -40,14 +40,14 @@ int main() {
 			DurationType quicksortDuration;
 			DurationType introsortDuration;
 			DurationType insertionSortDuration;
-			DurationType bogosortDuration;
+			// DurationType bogosortDuration;
 
 			STDSortTest(numbers, &stdDuration);
 			HeapsortTest(numbers, &heapsortDuration);
 			QuicksortTest(numbers, &quicksortDuration);
 			IntrosortTest(numbers, &introsortDuration);
 			InsertionSortTest(numbers, &insertionSortDuration);
-			BogosortTest(numbers, &bogosortDuration);
+			// BogosortTest(numbers, &bogosortDuration);
 
 			printf("Length = %d & Range = [%d-%d]\n",length, dataRange.first, dataRange.last);
 			printf("         std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(stdDuration).count());
@@ -55,7 +55,7 @@ int main() {
 			printf("         Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(quicksortDuration).count());
 			printf("         Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(introsortDuration).count());
 			printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(insertionSortDuration).count());
-			printf("          Bogosort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(bogosortDuration).count());
+			// printf("          Bogosort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(bogosortDuration).count());
 			cout << endl;
 		}
 	}
