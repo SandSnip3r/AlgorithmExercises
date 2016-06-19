@@ -14,7 +14,7 @@ namespace Introsort {
 
 	template<class RandomIt, class SizeType>
 	void SortLimitedDepth(RandomIt first, RandomIt end, SizeType depthLimit) {
-		while ((end-first) > int(SortThreshold)) {
+		while ((end-first) > static_cast<typename std::iterator_traits<RandomIt>::difference_type>(SortThreshold)) {
 			if (depthLimit == 0) {
 				//Hit our depth limit, do heapsort now
 				Heapsort::Sort(first,end);
@@ -31,7 +31,7 @@ namespace Introsort {
 
 	template<class RandomIt>
 	void Sort(RandomIt first, RandomIt end) {
-		auto length = end-first;
+		typename std::iterator_traits<RandomIt>::difference_type length = end-first;
 		int maxDepth = 2 * static_cast<int>(log2(length));
 		SortLimitedDepth(first, end, maxDepth);
 		//This leaves unsorted chunks of no more than size 'SortThreshold'
