@@ -6,6 +6,7 @@
 #include "heapsort.hpp"
 #include "insertionSort.hpp"
 #include "introsort.hpp"
+#include "mergeSort.hpp"
 #include "quicksort.hpp"
 #include "timeUtility.hpp"
 
@@ -25,6 +26,7 @@ void IntrosortTest(vector<int> numbers, DurationType *duration);
 void InsertionSortTest(vector<int> numbers, DurationType *duration);
 void BogosortTest(vector<int> numbers, DurationType *duration);
 void BubbleSortTest(vector<int> numbers, DurationType *duration);
+void MergeSortTest(vector<int> numbers, DurationType *duration);
 bool ComparisonFuntion(const int &a, const int &b);
 void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange);
 
@@ -94,6 +96,8 @@ void TestSorts(const vector<int> &numbers) {
 	// printf("          Bogosort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	BubbleSortTest(numbers, &duration);
 	printf("       Bubble sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	MergeSortTest(numbers, &duration);
+	printf("        Merge sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	cout << endl;
 
 }
@@ -167,6 +171,17 @@ void BubbleSortTest(vector<int> numbers, DurationType *duration) {
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Bubble sort failed!");
+	}
+}
+
+void MergeSortTest(vector<int> numbers, DurationType *duration) {
+	{
+		Timer<DurationType> timer(duration);
+		MergeSort::Sort(numbers.begin(), numbers.end());
+		//Timer's destruction will set duration
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Merge sort failed!");
 	}
 }
 
