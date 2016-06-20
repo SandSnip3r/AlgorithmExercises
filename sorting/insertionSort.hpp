@@ -14,7 +14,7 @@ namespace InsertionSort {
 		for (unsigned int i=1; i<length; ++i) {
 			ValueType val = *(first+i);
 			int newPos = i-1;
-			while (Comp(val, *(first+newPos)) && newPos >= 0) {
+			while (newPos >= 0 && Comp(val, *(first+newPos))) {
 				*(first+newPos+1) = *(first+newPos);
 				--newPos;
 			}

@@ -30,8 +30,8 @@ namespace Bogosort {
 
 	template<class RandomIt, class Compare>
 	void SortPermute(RandomIt first, RandomIt end, Compare comp) {
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
-		ValueType length = end - first;
+		using DifferenceType = typename std::iterator_traits<RandomIt>::difference_type;
+		DifferenceType length = end - first;
 		std::vector<int> p(length);
 		{
 			int i = 0;
