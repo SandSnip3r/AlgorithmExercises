@@ -25,23 +25,26 @@ namespace MergeSort {
 		}
 	}
 
-	template<class RandomIt, class Compare>
-	void SplitMerge(RandomIt first, RandomIt end, Compare Comp) {
-		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
-		DiffType length = end-first;
-		if (length == 1) {
-			return;
-		}
-		RandomIt middle = first + length/2;
-		SplitMerge(first, middle, Comp);
-		SplitMerge(middle, end, Comp);
-		//Left half and right half are sorted, now merge them
-		Merge(first, middle, end, Comp);
-	}
-
 	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
 	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
-		SplitMerge(first, end, Comp);
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		DiffType length = end-first;
+		for (int width=1; width<length; width*=2) {
+			//We are going to merge lists of length 'width'
+			for (int listStart=0; listStart<length; listStart+=(width*2)) {
+				//These 2 lists are [listStart, listStart+width) and [listStart+width, listStart+(width*2))
+				int firstPos = listStart;
+				int middlePos = listStart+width;
+				int endPos = listStart+(width*2);
+				if (middlePos >= length) {
+					middlePos = length;
+					endPos = length;
+				} else if (endPos >= length) {
+					endPos = length;
+				}
+				Merge(first+firstPos, first+middlePos, first+endPos, Comp);
+			}
+		}
 	}
 }
 
