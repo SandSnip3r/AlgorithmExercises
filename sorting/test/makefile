@@ -2,15 +2,21 @@ CC := g++-5
 WARNING_FLAGS := -Wall
 # WARNING_FLAGS := -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Werror -Wno-unused -Wstrict-overflow=5
 # WARNING_FLAGS := -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wswitch-default -Wundef -Werror -Wno-unused -Wstrict-overflow=2
-CFLAGS := -lgtest -lgtest_main -pthread -std=c++17 -O3 $(WARNING_FLAGS)
+CFLAGS := -std=c++17 -O3 $(WARNING_FLAGS)
 
-all: test
+all: googleTest timeTest
 
-test: test.o
-	$(CC) -o test test.o $(CFLAGS)
+googleTest: googleTest.o
+	$(CC) -o googleTest googleTest.o -lgtest -lgtest_main -pthread  $(CFLAGS)
 
-test.o: ../sorting/bogosort.hpp ../sorting/bubbleSort.hpp ../sorting/heapsort.hpp ../sorting/insertionSort.hpp ../sorting/introsort.hpp ../sorting/mergeSort.hpp ../sorting/quicksort.hpp test.cpp
-	$(CC) -c test.cpp -I../sorting/ $(CFLAGS)
+googleTest.o: ../bogosort.hpp ../bubbleSort.hpp ../heapsort.hpp ../insertionSort.hpp ../introsort.hpp ../mergeSort.hpp ../quicksort.hpp googleTest.cpp
+	$(CC) -c googleTest.cpp -I../ $(CFLAGS)
+
+timeTest: timeTest.o
+	$(CC) -o timeTest timeTest.o $(CFLAGS)
+
+timeTest.o: ../bogosort.hpp ../bubbleSort.hpp ../heapsort.hpp ../insertionSort.hpp ../introsort.hpp ../mergeSort.hpp ../quicksort.hpp timeTest.cpp ../../utilites/timeUtility.hpp
+	$(CC) -c timeTest.cpp -I../../utilites/ -I../ $(CFLAGS)
 
 clean:
 	$(RM) *.o
