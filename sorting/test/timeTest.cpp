@@ -8,6 +8,7 @@
 #include "introsort.hpp"
 #include "mergeSort.hpp"
 #include "quicksort.hpp"
+#include "selectionSort.hpp"
 #include "timeUtility.hpp"
 
 using namespace std;
@@ -20,13 +21,14 @@ struct DataRange {
 
 void TestSorts(const vector<int> &numbers);
 void STDSortTest(vector<int> numbers, DurationType *duration);
-void HeapsortTest(vector<int> numbers, DurationType *duration);
-void QuicksortTest(vector<int> numbers, DurationType *duration);
-void IntrosortTest(vector<int> numbers, DurationType *duration);
-void InsertionSortTest(vector<int> numbers, DurationType *duration);
 void BogosortTest(vector<int> numbers, DurationType *duration);
 void BubbleSortTest(vector<int> numbers, DurationType *duration);
+void HeapsortTest(vector<int> numbers, DurationType *duration);
+void InsertionSortTest(vector<int> numbers, DurationType *duration);
+void IntrosortTest(vector<int> numbers, DurationType *duration);
 void MergeSortTest(vector<int> numbers, DurationType *duration);
+void QuicksortTest(vector<int> numbers, DurationType *duration);
+void SelectionSortTest(vector<int> numbers, DurationType *duration);
 bool ComparisonFuntion(const int &a, const int &b);
 void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange);
 
@@ -83,21 +85,23 @@ void TestSorts(const vector<int> &numbers) {
 	DurationType duration;
 
 	STDSortTest(numbers, &duration);
-	printf("         std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
-	HeapsortTest(numbers, &duration);
-	printf("          Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
-	QuicksortTest(numbers, &duration);
-	printf("         Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
-	IntrosortTest(numbers, &duration);
-	printf("         Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
-	InsertionSortTest(numbers, &duration);
-	printf("    Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("             std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	// BogosortTest(numbers, &duration);
 	// printf("          Bogosort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	BubbleSortTest(numbers, &duration);
-	printf("       Bubble sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("           Bubble sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	HeapsortTest(numbers, &duration);
+	printf("              Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	InsertionSortTest(numbers, &duration);
+	printf("        Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	IntrosortTest(numbers, &duration);
+	printf("             Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	MergeSortTest(numbers, &duration);
-	printf("        Merge sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("            Merge sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	QuicksortTest(numbers, &duration);
+	printf("             Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	SelectionSortTest(numbers, &duration);
+	printf("        Selection sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	cout << endl;
 
 }
@@ -182,6 +186,17 @@ void MergeSortTest(vector<int> numbers, DurationType *duration) {
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Merge sort failed!");
+	}
+}
+
+void SelectionSortTest(vector<int> numbers, DurationType *duration) {
+	{
+		Timer<DurationType> timer(duration);
+		SelectionSort::Sort(numbers.begin(), numbers.end());
+		//Timer's destruction will set duration
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Selection sort failed!");
 	}
 }
 

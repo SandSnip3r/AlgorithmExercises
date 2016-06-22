@@ -12,6 +12,7 @@
 #include "introsort.hpp"
 #include "mergeSort.hpp"
 #include "quicksort.hpp"
+#include "selectionSort.hpp"
 
 using namespace std;
 
@@ -151,6 +152,14 @@ TYPED_TEST(VectorOfNumbersTest, Quicksort) {
 	}
 }
 
+TYPED_TEST(VectorOfNumbersTest, SelectionSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		auto inputCopy = this->input.at(i);
+		SelectionSort::Sort(inputCopy.begin(), inputCopy.end());
+		EXPECT_EQ(inputCopy, this->expected.at(i));
+	}
+}
+
 class VectorOfStringsTest : public ::testing::Test {
 protected:
 	vector<vector<string>> input;
@@ -268,7 +277,13 @@ TEST_F(VectorOfStringsTest, Quicksort) {
 	}
 }
 
-
+TEST_F(VectorOfStringsTest, SelectionSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		auto inputCopy = this->input.at(i);
+		SelectionSort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
+		EXPECT_EQ(inputCopy, this->expected.at(i));
+	}
+}
 
 class VectorOfDistancesTest : public ::testing::Test {
 protected:
@@ -374,6 +389,14 @@ TEST_F(VectorOfDistancesTest, Quicksort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		auto inputCopy = this->input.at(i);
 		Quicksort::Sort(inputCopy.begin(), inputCopy.end());
+		EXPECT_EQ(inputCopy, this->expected.at(i));
+	}
+}
+
+TEST_F(VectorOfDistancesTest, SelectionSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		auto inputCopy = this->input.at(i);
+		SelectionSort::Sort(inputCopy.begin(), inputCopy.end());
 		EXPECT_EQ(inputCopy, this->expected.at(i));
 	}
 }
