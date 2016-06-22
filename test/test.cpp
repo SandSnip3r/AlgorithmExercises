@@ -52,9 +52,9 @@ protected:
 			sort(i.begin(), i.end());
 			expected.emplace_back(i);
 		}
-		CreateLongRandomListOfNumbers();
+		CreateLongRandomList();
 	}
-	void CreateLongRandomListOfNumbers() {
+	void CreateLongRandomList() {
 		random_device rd;
 		vector<unsigned int> seeds;
 		for (unsigned int i=0; i<mt19937::state_size; ++i) {
@@ -165,9 +165,9 @@ protected:
 			sort(i.begin(), i.end(), StringComp);
 			expected.emplace_back(i);
 		}
-		CreateLongRandomListOfStrings();
+		CreateLongRandomList();
 	}
-	void CreateLongRandomListOfStrings() {
+	void CreateLongRandomList() {
 		random_device rd;
 		vector<unsigned int> seeds;
 		for (unsigned int i=0; i<mt19937::state_size; ++i) {
@@ -175,14 +175,14 @@ protected:
 		}
 		seed_seq s(seeds.begin(),seeds.end());
 		mt19937 eng(s);
-		uniform_int_distribution<int> numOfStringsDist(1000,9999);
+		uniform_int_distribution<int> listLengthDist(1000,9999);
 		uniform_int_distribution<int> charsInStringDist(1,500);
 		uniform_int_distribution<int> charsDist(' ','~');
 
 		vector<string> strings;
 
-		int numOfStrings = numOfStringsDist(eng);
-		for (int i=0; i<numOfStrings; ++i) {
+		int length = listLengthDist(eng);
+		for (int i=0; i<length; ++i) {
 			int charCount = charsInStringDist(eng);
 			std::string s;
 			for (int j=0; j<charCount; ++j) {
@@ -275,14 +275,17 @@ protected:
 	vector<vector<Distance>> input;
 	vector<vector<Distance>> expected;
 	virtual void SetUp() {
-		for (auto i : { vector<Distance>{ {2, 2.3}, {3, 2.3}, {2, 2.2} } }) {
+		for (auto i : { vector<Distance>{ {1, 5.6789}, {2, 5.6789}, {3, 5.6789} },
+										vector<Distance>{ {10, 10.123}, {10, 20.456}, {10, 30.789} },
+										vector<Distance>{ {2, 2.3}, {3, 2.3}, {2, 2.2} },
+										vector<Distance>{ {1, 100.5}, {1, 23.6363}, {9, 45634.22}, {9, 0.00001} } }) {
 			input.emplace_back(i);
 			sort(i.begin(), i.end());
 			expected.emplace_back(i);
 		}
-		// CreateLongRandomListOfStrings();
+		CreateLongRandomList();
 	}
-	/*void CreateLongRandomListOfStrings() {
+	void CreateLongRandomList() {
 		random_device rd;
 		vector<unsigned int> seeds;
 		for (unsigned int i=0; i<mt19937::state_size; ++i) {
@@ -290,26 +293,21 @@ protected:
 		}
 		seed_seq s(seeds.begin(),seeds.end());
 		mt19937 eng(s);
-		uniform_int_distribution<int> numOfStringsDist(1000,9999);
-		uniform_int_distribution<int> charsInStringDist(1,500);
-		uniform_int_distribution<int> charsDist(' ','~');
+		uniform_int_distribution<int> listLengthDist(1000,9999);
+		uniform_int_distribution<int> intDist(0,1000);
+		uniform_real_distribution<double> doubleDist(0,1000);
 
-		vector<string> strings;
+		vector<Distance> distances;
 
-		int numOfStrings = numOfStringsDist(eng);
-		for (int i=0; i<numOfStrings; ++i) {
-			int charCount = charsInStringDist(eng);
-			std::string s;
-			for (int j=0; j<charCount; ++j) {
-				s += charsDist(eng);
-			}
-			strings.emplace_back(s);
+		int length = listLengthDist(eng);
+		for (int i=0; i<length; ++i) {
+			distances.emplace_back(intDist(eng), doubleDist(eng));
 		}
 
-		input.emplace_back(strings);
-		sort(strings.begin(), strings.end());
-		expected.emplace_back(strings);
-	}*/
+		input.emplace_back(distances);
+		sort(distances.begin(), distances.end());
+		expected.emplace_back(distances);
+	}
 };
 
 TEST_F(VectorOfDistancesTest, BogosortRandom) {
