@@ -19,3 +19,4 @@
   - Merge sort
     - Implemented using a bottom-up approach (non-recursive)
   - Selection sort
+  - Timsort
