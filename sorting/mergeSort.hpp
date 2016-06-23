@@ -7,22 +7,38 @@
 namespace MergeSort {
 	template<class RandomIt, class Compare>
 	void Merge(RandomIt first, RandomIt middle, RandomIt end, Compare Comp) {
-		while (middle != end) {
-			while (first != middle && Comp(*first, *middle)) {
-				++first;
-			}
-			if (first == middle) {
-				//All good
-				return;
+		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		DiffType length = end-first;
+		RandomIt leftIt = first;
+		RandomIt rightIt = middle;
+		std::vector<ValueType> tempList;
+		tempList.reserve(length);
+		while (leftIt != middle && rightIt != end) {
+			//While there are elements in both lists
+			if (Comp(*leftIt,*rightIt)) {
+				//Left list's first element goes first
+				tempList.emplace_back(*leftIt);
+				++leftIt;
 			} else {
-				//Need to do a rotate
-				//	This moves 'middle' to the position of 'first',
-				//	and shifts [first, middle) to the right one
-				std::rotate(first, middle, middle+1);
-				++first;
-				++middle;
+				//Right list's first element goes first
+				tempList.emplace_back(*rightIt);
+				++rightIt;
 			}
 		}
+		//Now at least one list is empty
+		while (leftIt != middle) {
+			//Insert all of the left list into the list (right is empty)
+			tempList.emplace_back(*leftIt);
+			++leftIt;
+		}
+		while (rightIt != end) {
+			//Insert all of the right list into the list (left is empty)
+			tempList.emplace_back(*rightIt);
+			++rightIt;
+		}
+		//Move temp into the given container
+		std::move(tempList.begin(), tempList.end(), first);
 	}
 
 	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
