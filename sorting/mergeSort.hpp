@@ -5,8 +5,31 @@
 #define _MERGESORT_HPP 1
 
 namespace MergeSort {
+
+	enum class MergeType { InPlace, ExtraSpace };
+
 	template<class RandomIt, class Compare>
-	void Merge(RandomIt first, RandomIt middle, RandomIt end, Compare Comp) {
+	void InPlaceMerge(RandomIt first, RandomIt middle, RandomIt end, Compare Comp) {
+		while (middle != end) {
+			while (first != middle && Comp(*first, *middle)) {
+				++first;
+			}
+			if (first == middle) {
+				//All good
+				return;
+			} else {
+				//Need to do a rotate
+				//      This moves 'middle' to the position of 'first',
+				//      and shifts [first, middle) to the right one
+				std::rotate(first, middle, middle+1);
+				++first;
+				++middle;
+			}
+		}
+	}
+
+	template<class RandomIt, class Compare>
+	void ExtraSpaceMerge(RandomIt first, RandomIt middle, RandomIt end, Compare Comp) {
 		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 		DiffType length = end-first;
@@ -42,7 +65,13 @@ namespace MergeSort {
 	}
 
 	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
-	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
+	void Sort(RandomIt first, RandomIt end, MergeType mergeType = MergeType::ExtraSpace, Compare Comp = Compare()) {
+		std::function<void(RandomIt,RandomIt,RandomIt,Compare)> MergeFunction;
+		if (mergeType == MergeType::ExtraSpace) {
+			MergeFunction = ExtraSpaceMerge<RandomIt,Compare>;
+		} else {
+			MergeFunction = InPlaceMerge<RandomIt,Compare>;
+		}
 		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
 		DiffType length = end-first;
 		for (int width=1; width<length; width*=2) {
@@ -58,7 +87,7 @@ namespace MergeSort {
 				} else if (endPos >= length) {
 					endPos = length;
 				}
-				Merge(first+firstPos, first+middlePos, first+endPos, Comp);
+				MergeFunction(first+firstPos, first+middlePos, first+endPos, Comp);
 			}
 		}
 	}

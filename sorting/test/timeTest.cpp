@@ -21,12 +21,14 @@ struct DataRange {
 
 void TestSorts(const vector<int> &numbers);
 void STDSortTest(vector<int> numbers, DurationType *duration);
-void BogosortTest(vector<int> numbers, DurationType *duration);
+void BogosortRandomTest(vector<int> numbers, DurationType *duration);
+void BogosortPermuteTest(vector<int> numbers, DurationType *duration);
 void BubbleSortTest(vector<int> numbers, DurationType *duration);
 void HeapsortTest(vector<int> numbers, DurationType *duration);
 void InsertionSortTest(vector<int> numbers, DurationType *duration);
 void IntrosortTest(vector<int> numbers, DurationType *duration);
-void MergeSortTest(vector<int> numbers, DurationType *duration);
+void MergeSortExtraSpaceTest(vector<int> numbers, DurationType *duration);
+void MergeSortInPlaceTest(vector<int> numbers, DurationType *duration);
 void QuicksortTest(vector<int> numbers, DurationType *duration);
 void SelectionSortTest(vector<int> numbers, DurationType *duration);
 bool ComparisonFuntion(const int &a, const int &b);
@@ -85,23 +87,29 @@ void TestSorts(const vector<int> &numbers) {
 	DurationType duration;
 
 	STDSortTest(numbers, &duration);
-	printf("             std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
-	// BogosortTest(numbers, &duration);
-	// printf("          Bogosort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("                             std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	if (numbers.size() <= 10) {
+		BogosortRandomTest(numbers, &duration);
+		printf("                       Bogosort random time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+		BogosortPermuteTest(numbers, &duration);
+		printf("                      Bogosort permute time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	}
 	BubbleSortTest(numbers, &duration);
-	printf("           Bubble sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("                           Bubble sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	HeapsortTest(numbers, &duration);
-	printf("              Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("                              Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	InsertionSortTest(numbers, &duration);
-	printf("        Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("                        Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	IntrosortTest(numbers, &duration);
-	printf("             Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
-	MergeSortTest(numbers, &duration);
-	printf("            Merge sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("                             Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	MergeSortExtraSpaceTest(numbers, &duration);
+	printf("                Merge sort extra space time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	MergeSortInPlaceTest(numbers, &duration);
+	printf("                   Merge sort in place time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	QuicksortTest(numbers, &duration);
-	printf("             Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("                             Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	SelectionSortTest(numbers, &duration);
-	printf("        Selection sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	printf("                        Selection sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
 	cout << endl;
 
 }
@@ -109,14 +117,12 @@ void TestSorts(const vector<int> &numbers) {
 void STDSortTest(vector<int> numbers, DurationType *duration) {
 	Timer<DurationType> timer(duration);
 	sort(numbers.begin(), numbers.end());
-	//Timer's destruction will set duration
 }
 
 void HeapsortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
 		Heapsort::Sort(numbers.begin(), numbers.end(), ComparisonFuntion);
-		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end(), ComparisonFuntion)) {
 		throw std::runtime_error("Heapsort failed!");
@@ -127,7 +133,6 @@ void QuicksortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
 		Quicksort::Sort(numbers.begin(), numbers.end());
-		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Quicksort failed!");
@@ -138,7 +143,6 @@ void IntrosortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
 		Introsort::Sort(numbers.begin(), numbers.end());
-		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Introsort failed!");
@@ -149,18 +153,26 @@ void InsertionSortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
 		InsertionSort::Sort(numbers.begin(), numbers.end());
-		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Insertions ort failed!");
 	}
 }
 
-void BogosortTest(vector<int> numbers, DurationType *duration) {
+void BogosortRandomTest(vector<int> numbers, DurationType *duration) {
+	{
+		Timer<DurationType> timer(duration);
+		Bogosort::Sort(numbers.begin(), numbers.end(), Bogosort::ShuffleType::Random);
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Bogosort failed!");
+	}
+}
+
+void BogosortPermuteTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
 		Bogosort::Sort(numbers.begin(), numbers.end(), Bogosort::ShuffleType::Permute);
-		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Bogosort failed!");
@@ -171,18 +183,26 @@ void BubbleSortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
 		BubbleSort::Sort(numbers.begin(), numbers.end());
-		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Bubble sort failed!");
 	}
 }
 
-void MergeSortTest(vector<int> numbers, DurationType *duration) {
+void MergeSortExtraSpaceTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
-		MergeSort::Sort(numbers.begin(), numbers.end());
-		//Timer's destruction will set duration
+		MergeSort::Sort(numbers.begin(), numbers.end(), MergeSort::MergeType::ExtraSpace);
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw std::runtime_error("Merge sort failed!");
+	}
+}
+
+void MergeSortInPlaceTest(vector<int> numbers, DurationType *duration) {
+	{
+		Timer<DurationType> timer(duration);
+		MergeSort::Sort(numbers.begin(), numbers.end(), MergeSort::MergeType::InPlace);
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Merge sort failed!");
@@ -193,7 +213,6 @@ void SelectionSortTest(vector<int> numbers, DurationType *duration) {
 	{
 		Timer<DurationType> timer(duration);
 		SelectionSort::Sort(numbers.begin(), numbers.end());
-		//Timer's destruction will set duration
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw std::runtime_error("Selection sort failed!");

@@ -136,10 +136,18 @@ TYPED_TEST(VectorOfNumbersTest, Introsort) {
 	}
 }
 
-TYPED_TEST(VectorOfNumbersTest, MergeSort) {
+TYPED_TEST(VectorOfNumbersTest, ExtraSpaceMergeSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		auto inputCopy = this->input.at(i);
-		MergeSort::Sort(inputCopy.begin(), inputCopy.end());
+		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), MergeSort::MergeType::ExtraSpace);
+		EXPECT_EQ(inputCopy, this->expected.at(i));
+	}
+}
+
+TYPED_TEST(VectorOfNumbersTest, InPlaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		auto inputCopy = this->input.at(i);
+		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), MergeSort::MergeType::InPlace);
 		EXPECT_EQ(inputCopy, this->expected.at(i));
 	}
 }
@@ -261,10 +269,18 @@ TEST_F(VectorOfStringsTest, Introsort) {
 	}
 }
 
-TEST_F(VectorOfStringsTest, MergeSort) {
+TEST_F(VectorOfStringsTest, ExtraSpaceMergeSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		auto inputCopy = this->input.at(i);
-		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
+		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), MergeSort::MergeType::ExtraSpace, this->StringComp);
+		EXPECT_EQ(inputCopy, this->expected.at(i));
+	}
+}
+
+TEST_F(VectorOfStringsTest, InPlaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		auto inputCopy = this->input.at(i);
+		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), MergeSort::MergeType::InPlace, this->StringComp);
 		EXPECT_EQ(inputCopy, this->expected.at(i));
 	}
 }
@@ -377,10 +393,18 @@ TEST_F(VectorOfDistancesTest, Introsort) {
 	}
 }
 
-TEST_F(VectorOfDistancesTest, MergeSort) {
+TEST_F(VectorOfDistancesTest, ExtraSpaceMergeSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		auto inputCopy = this->input.at(i);
-		MergeSort::Sort(inputCopy.begin(), inputCopy.end());
+		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), MergeSort::MergeType::ExtraSpace);
+		EXPECT_EQ(inputCopy, this->expected.at(i));
+	}
+}
+
+TEST_F(VectorOfDistancesTest, InPlaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		auto inputCopy = this->input.at(i);
+		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), MergeSort::MergeType::InPlace);
 		EXPECT_EQ(inputCopy, this->expected.at(i));
 	}
 }
