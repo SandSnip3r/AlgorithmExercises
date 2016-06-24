@@ -18,6 +18,7 @@
 - Merge sort
   - Implemented using a bottom-up approach (non-recursive)
 - Selection sort
+
 #### Planned algorithms
 - Timsort
 - Smoothsort
