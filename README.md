@@ -1,6 +1,6 @@
 # Algorithm Exercises
 ## C++
-- #### Currently implemented algorithms
+- **Currently implemented algorithms**
   - Heapsort
     - Heapify-down implemented as non-recursive
   - Quicksort
@@ -19,6 +19,6 @@
   - Merge sort
     - Implemented using a bottom-up approach (non-recursive)
   - Selection sort
-- #### Planned algorithms
+- **Planned algorithms**
   - Timsort
   - Smoothsort
