@@ -155,7 +155,7 @@ void InsertionSortTest(vector<int> numbers, DurationType *duration) {
 		InsertionSort::Sort(numbers.begin(), numbers.end());
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Insertions ort failed!");
+		throw std::runtime_error("Insertion sort failed!");
 	}
 }
 

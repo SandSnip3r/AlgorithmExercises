@@ -16,11 +16,12 @@ namespace InsertionSort {
 		for (unsigned int i=1; i<length; ++i) {
 			ValueType val = *(first+i);
 			int newPos = i-1;
-			while (newPos >= 0 && Comp(val, *(first+newPos))) {
-				*(first+newPos+1) = *(first+newPos);
+			while (newPos > 0 && Comp(val, *(first+newPos))) {
+				// *(first+newPos+1) = *(first+newPos);
 				--newPos;
 			}
-			*(first+newPos+1) = val;
+			std::rotate(first+newPos, first+i, first+i+1);
+			// *(first+newPos+1) = val;
 		}
 	}
 }
