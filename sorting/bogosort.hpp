@@ -30,13 +30,18 @@ namespace Bogosort {
 
 	template<class RandomIt, class Compare>
 	void SortPermute(RandomIt first, RandomIt end, Compare comp) {
+		//This method will iteratate through every permutation of the list possible
+		// (not necessarily in lexicographical order)
 		using DifferenceType = typename std::iterator_traits<RandomIt>::difference_type;
+
 		DifferenceType length = end - first;
+
 		std::vector<int> p(length);
 		{
 			int i = 0;
 			std::generate(p.begin(), p.end(), [&i]{return i++;});
 		}
+
 		int i=1;
 		while (!std::is_sorted(first, end, comp) && i<length) {
 			--p.at(i);

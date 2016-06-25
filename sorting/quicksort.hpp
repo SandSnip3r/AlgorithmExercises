@@ -8,13 +8,17 @@ namespace Quicksort {
 	template<class RandomIt, class Compare>
 	RandomIt GetMedian(RandomIt first, RandomIt middle, RandomIt last, Compare Comp) {
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+
 		if (middle == last) {
 			//If there are 2 elements, there isnt really a middle
+			//	there's either 1 or 2 elements
 			return last;
 		}
+
 		ValueType firstValue = *first;
 		ValueType middleValue = *middle;
 		ValueType lastValue = *last;
+
 		if (!Comp(lastValue, middleValue) && !Comp(middleValue, firstValue)) {
 			//middle is the median
 			return middle;
@@ -31,9 +35,11 @@ namespace Quicksort {
 	RandomIt Partition(RandomIt first, RandomIt end, Compare Comp) {
 		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+
 		DiffType length = end-first;
 		RandomIt last = end - 1;
 		RandomIt middle = first + length/2;
+
 		//For the pivot, use the median of the first, last, and middle element
 		ValueType pivot = *GetMedian(first, middle, last, Comp);
 		while (1) {
@@ -44,6 +50,8 @@ namespace Quicksort {
 				--last;
 			}
 			if (last-first <= 0) {
+				//The first and last iterators have crossed eachother
+				//	everything is now on the correct side of the pivot
 				return first;
 			}
 			std::iter_swap(first,last);
@@ -55,7 +63,9 @@ namespace Quicksort {
 	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
 	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
 		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+		
 		DiffType length = end-first;
+
 		if (length > 1) {
 			//At least 2 elements to sort
 			RandomIt partition = Partition(first, end, Comp);
