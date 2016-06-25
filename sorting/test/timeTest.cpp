@@ -84,32 +84,45 @@ int main() {
 }
 
 void TestSorts(const vector<int> &numbers) {
+	struct SortResult {
+		string sortName;
+		double duration;
+		SortResult(string name, double d) : sortName(name), duration(d) {};
+	};
+
+	vector<SortResult> sortResults;
+
 	DurationType duration;
 
 	STDSortTest(numbers, &duration);
-	printf("                             std::sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("std::sort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	if (numbers.size() <= 10) {
 		BogosortRandomTest(numbers, &duration);
-		printf("                       Bogosort random time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+		sortResults.emplace_back("Bogosort random",chrono::duration_cast<chrono::duration<double>>(duration).count());
 		BogosortPermuteTest(numbers, &duration);
-		printf("                      Bogosort permute time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+		sortResults.emplace_back("Bogosort permute",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	}
 	BubbleSortTest(numbers, &duration);
-	printf("                           Bubble sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Bubble sort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	HeapsortTest(numbers, &duration);
-	printf("                              Heapsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Heapsort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	InsertionSortTest(numbers, &duration);
-	printf("                        Insertion sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Insertion sort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	IntrosortTest(numbers, &duration);
-	printf("                             Introsort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Introsort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	MergeSortExtraSpaceTest(numbers, &duration);
-	printf("                Merge sort extra space time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Merge sort extra space",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	MergeSortInPlaceTest(numbers, &duration);
-	printf("                   Merge sort in place time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Merge sort in place",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	QuicksortTest(numbers, &duration);
-	printf("                             Quicksort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Quicksort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	SelectionSortTest(numbers, &duration);
-	printf("                        Selection sort time: %.8lf seconds\n", chrono::duration_cast<chrono::duration<double>>(duration).count());
+	sortResults.emplace_back("Selection sort",chrono::duration_cast<chrono::duration<double>>(duration).count());
+
+	sort(sortResults.begin(), sortResults.end(), [](const SortResult &a, const SortResult &b){ return a.duration < b.duration; });
+	for (const SortResult &sortResult : sortResults) {
+		printf("%26s time: %.8lf seconds\n", sortResult.sortName.c_str(), sortResult.duration);
+	}
 	cout << endl;
 
 }
@@ -125,7 +138,7 @@ void HeapsortTest(vector<int> numbers, DurationType *duration) {
 		Heapsort::Sort(numbers.begin(), numbers.end(), ComparisonFuntion);
 	}
 	if (!is_sorted(numbers.begin(), numbers.end(), ComparisonFuntion)) {
-		throw std::runtime_error("Heapsort failed!");
+		throw runtime_error("Heapsort failed!");
 	}
 }
 
@@ -135,7 +148,7 @@ void QuicksortTest(vector<int> numbers, DurationType *duration) {
 		Quicksort::Sort(numbers.begin(), numbers.end());
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Quicksort failed!");
+		throw runtime_error("Quicksort failed!");
 	}
 }
 
@@ -145,7 +158,7 @@ void IntrosortTest(vector<int> numbers, DurationType *duration) {
 		Introsort::Sort(numbers.begin(), numbers.end());
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Introsort failed!");
+		throw runtime_error("Introsort failed!");
 	}
 }
 
@@ -155,7 +168,7 @@ void InsertionSortTest(vector<int> numbers, DurationType *duration) {
 		InsertionSort::Sort(numbers.begin(), numbers.end());
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Insertion sort failed!");
+		throw runtime_error("Insertion sort failed!");
 	}
 }
 
@@ -165,7 +178,7 @@ void BogosortRandomTest(vector<int> numbers, DurationType *duration) {
 		Bogosort::Sort(numbers.begin(), numbers.end(), Bogosort::ShuffleType::Random);
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Bogosort failed!");
+		throw runtime_error("Bogosort failed!");
 	}
 }
 
@@ -175,7 +188,7 @@ void BogosortPermuteTest(vector<int> numbers, DurationType *duration) {
 		Bogosort::Sort(numbers.begin(), numbers.end(), Bogosort::ShuffleType::Permute);
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Bogosort failed!");
+		throw runtime_error("Bogosort failed!");
 	}
 }
 
@@ -185,7 +198,7 @@ void BubbleSortTest(vector<int> numbers, DurationType *duration) {
 		BubbleSort::Sort(numbers.begin(), numbers.end());
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Bubble sort failed!");
+		throw runtime_error("Bubble sort failed!");
 	}
 }
 
@@ -195,7 +208,7 @@ void MergeSortExtraSpaceTest(vector<int> numbers, DurationType *duration) {
 		MergeSort::Sort(numbers.begin(), numbers.end(), MergeSort::MergeType::ExtraSpace);
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Merge sort failed!");
+		throw runtime_error("Merge sort failed!");
 	}
 }
 
@@ -205,7 +218,7 @@ void MergeSortInPlaceTest(vector<int> numbers, DurationType *duration) {
 		MergeSort::Sort(numbers.begin(), numbers.end(), MergeSort::MergeType::InPlace);
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Merge sort failed!");
+		throw runtime_error("Merge sort failed!");
 	}
 }
 
@@ -215,7 +228,7 @@ void SelectionSortTest(vector<int> numbers, DurationType *duration) {
 		SelectionSort::Sort(numbers.begin(), numbers.end());
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
-		throw std::runtime_error("Selection sort failed!");
+		throw runtime_error("Selection sort failed!");
 	}
 }
 
