@@ -37,6 +37,15 @@ void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange)
 
 int main() {
 	const int testLength = 100000;
+
+	random_device rd;
+	vector<unsigned int> seeds;
+	for (unsigned int i=0; i<mt19937::state_size; ++i) {
+		seeds.emplace_back(rd());
+	}
+	seed_seq s(seeds.begin(),seeds.end());
+	mt19937 eng(s);
+
 	//====================Test a list where all numbers are identical====================
 	{
 		vector<int> numbers(testLength,1);
@@ -83,18 +92,64 @@ int main() {
 		printf("Length = %d & pyramid list (ex. 1 2 3 4 3 2 1)\n",testLength);
 		TestSorts(numbers);
 	}
+	
+	//=====================Test a list that decreases then increases=====================
+	{
+		vector<int> numbers;
+		numbers.resize(testLength);
+		for (int i=0, n=0; i<testLength; ++i) {
+			numbers.emplace_back(testLength-n);
+			if (i < (testLength/2)) {
+				++n;
+			} else {
+				--n;
+			}
+		}
+
+		printf("Length = %d & inverted pyramid list (ex. 4 3 2 1 2 3 4)\n",testLength);
+		TestSorts(numbers);
+	}
 
 	//=============================Test some random numbers==============================
 	{
 		vector<int> numbers;
 		numbers.reserve(testLength);
-		for (DataRange dataRange : { 	DataRange{1,10}, 
-																	DataRange{1,10000000} }) {
-			CreateRandomData(&numbers, testLength, dataRange);
-
-			printf("Length = %d & random range [%d-%d]\n",testLength, dataRange.first, dataRange.last);
-			TestSorts(numbers);
+		uniform_int_distribution<int> dist(1,10);
+		for (int i=0; i<testLength; ++i) {
+			numbers.emplace_back(dist(eng));
 		}
+		printf("Length = %d & random range [1-10]\n",testLength);
+		TestSorts(numbers);
+	}
+	{
+		vector<int> numbers;
+		numbers.reserve(testLength);
+		uniform_int_distribution<int> dist(1,1000000000);
+		for (int i=0; i<testLength; ++i) {
+			numbers.emplace_back(dist(eng));
+		}
+		printf("Length = %d & random range [1-1000000000]\n",testLength);
+		TestSorts(numbers);
+	}
+	{
+		vector<int> numbers;
+		numbers.reserve(testLength);
+		for (int i=0; i<testLength; ++i) {
+			uniform_int_distribution<int> dist(i-3,i+3);
+			numbers.emplace_back(dist(eng));
+		}
+		printf("Length = %d & rougly increasing random\n",testLength);
+		TestSorts(numbers);
+	}
+	{
+		vector<int> numbers;
+		numbers.reserve(testLength);
+		for (int i=0; i<testLength; ++i) {
+			uniform_int_distribution<int> dist(i-3,i+3);
+			numbers.emplace_back(testLength - dist(eng));
+		}
+		printf("Length = %d & rougly decreasing random\n",testLength);
+		TestSorts(numbers);
 	}
 
 	return 0;
@@ -257,20 +312,4 @@ void SelectionSortTest(vector<int> numbers, DurationType *duration) {
 
 bool ComparisonFuntion(const int &a, const int &b) {
 	return a < b;
-}
-
-void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange) {
-	numbers->clear();
-	random_device rd;
-	vector<unsigned int> seeds;
-	for (unsigned int i=0; i<mt19937::state_size; ++i) {
-		seeds.emplace_back(rd());
-	}
-	seed_seq s(seeds.begin(),seeds.end());
-	mt19937 eng(s);
-	uniform_int_distribution<int> dist(dataRange.first,dataRange.last);
-	while (dataLength > 0) {
-		numbers->emplace_back(dist(eng));
-		--dataLength;
-	}
 }
