@@ -31,38 +31,39 @@ namespace MergeSort {
 
 	template<class RandomIt, class Compare>
 	void ExtraSpaceMerge(RandomIt first, RandomIt middle, RandomIt end, Compare Comp) {
-		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 
-		DiffType length = end-first;
-		RandomIt leftIt = first;
+		//Save the left list in a temp because we'll be overwriting it as we insert
+		std::vector<ValueType> tempList(first,middle);
+		auto leftIt = tempList.begin();
+		auto leftEnd = tempList.end();
+
 		RandomIt rightIt = middle;
+		RandomIt rightEnd = end;
 
-		std::vector<ValueType> tempList;
-		tempList.reserve(length);
+		RandomIt insertIt = first;
 
-		while (leftIt != middle && rightIt != end) {
+		while (leftIt != leftEnd && rightIt != rightEnd) {
 			//While there are elements in both lists
 			if (Comp(*leftIt,*rightIt)) {
 				//Left list's first element goes first
-				tempList.emplace_back(*leftIt);
+				*insertIt = *leftIt;
 				++leftIt;
 			} else {
 				//Right list's first element goes first
-				tempList.emplace_back(*rightIt);
+				*insertIt = *rightIt;
 				++rightIt;
 			}
+			++insertIt;
 		}
 		//Now at least one list is empty
-		if (leftIt != middle) {
+		if (leftIt != leftEnd) {
 			//Insert all of the left list into the list (right is empty)
-			std::move(leftIt, middle, std::back_inserter(tempList));
-		} else if (rightIt != end) {
+			std::move(leftIt, leftEnd, insertIt);
+		} else if (rightIt != rightEnd) {
 			//Insert all of the right list into the list (left is empty)
-			std::move(rightIt, end, std::back_inserter(tempList));
+			std::move(rightIt, rightEnd, insertIt);
 		}
-		//Move temp into the given container
-		std::move(tempList.begin(), tempList.end(), first);
 	}
 
 	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
@@ -75,16 +76,15 @@ namespace MergeSort {
 			MergeFunction = InPlaceMerge<RandomIt,Compare>;
 		}
 
-		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
-		DiffType length = end-first;
+		size_t length = end-first;
 
-		for (int width=1; width<length; width*=2) {
+		for (size_t width=1; width<length; width*=2) {
 			//We are going to merge lists of length 'width'
-			for (int listStart=0; listStart<length; listStart+=(width*2)) {
+			for (size_t listStart=0; listStart<length; listStart+=(width*2)) {
 				//These 2 lists are [listStart, listStart+width) and [listStart+width, listStart+(width*2))
-				int firstPos = listStart;
-				int middlePos = listStart+width;
-				int endPos = listStart+(width*2);
+				size_t firstPos = listStart;
+				size_t middlePos = listStart+width;
+				size_t endPos = listStart+(width*2);
 				if (middlePos >= length) {
 					middlePos = length;
 					endPos = length;
