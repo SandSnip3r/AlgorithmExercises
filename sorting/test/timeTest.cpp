@@ -1,4 +1,5 @@
 #include <chrono>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include "bogosort.hpp"
@@ -35,47 +36,63 @@ bool ComparisonFuntion(const int &a, const int &b);
 void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange);
 
 int main() {
+	const int testLength = 100000;
 	//====================Test a list where all numbers are identical====================
-	for (auto length : { 100, 10000, 100000 }) {
-		vector<int> numbers(length,1);
+	{
+		vector<int> numbers(testLength,1);
 
-		printf("Length = %d & all identical\n",length);
+		printf("Length = %d & all identical\n",testLength);
 		TestSorts(numbers);
 	}
 	
 	//===========================Test a list already in order============================
-	for (auto length : { 100, 10000, 100000 }) {
+	{
 		vector<int> numbers;
-		numbers.resize(length);
+		numbers.resize(testLength);
 		int i=0;
 		generate(numbers.begin(), numbers.end(), [&i]{ return i++; });
 
-		printf("Length = %d & in order\n",length);
+		printf("Length = %d & in order\n",testLength);
 		TestSorts(numbers);
 	}
 	
 	//============================Test a list in reverse order===========================
-	for (auto length : { 100, 10000, 100000 }) {
+	{
 		vector<int> numbers;
-		numbers.resize(length);
-		int i=length;
+		numbers.resize(testLength);
+		int i=testLength;
 		generate(numbers.begin(), numbers.end(), [&i]{ return --i; });
 
-		printf("Length = %d & in reverse order\n",length);
+		printf("Length = %d & in reverse order\n",testLength);
+		TestSorts(numbers);
+	}
+	
+	//=====================Test a list that increases then decreases=====================
+	{
+		vector<int> numbers;
+		numbers.resize(testLength);
+		for (int i=0, n=0; i<testLength; ++i) {
+			numbers.emplace_back(n);
+			if (i < (testLength/2)) {
+				++n;
+			} else {
+				--n;
+			}
+		}
+
+		printf("Length = %d & pyramid list (ex. 1 2 3 4 3 2 1)\n",testLength);
 		TestSorts(numbers);
 	}
 
 	//=============================Test some random numbers==============================
-	for (auto length : { 10, 100, 1000, 10000, 100000 }) {
+	{
 		vector<int> numbers;
-		numbers.reserve(length);
+		numbers.reserve(testLength);
 		for (DataRange dataRange : { 	DataRange{1,10}, 
-																	DataRange{1,100}, 
-																	DataRange{1,1000}, 
 																	DataRange{1,10000000} }) {
-			CreateRandomData(&numbers, length, dataRange);
+			CreateRandomData(&numbers, testLength, dataRange);
 
-			printf("Length = %d & random range [%d-%d]\n",length, dataRange.first, dataRange.last);
+			printf("Length = %d & random range [%d-%d]\n",testLength, dataRange.first, dataRange.last);
 			TestSorts(numbers);
 		}
 	}
@@ -120,8 +137,14 @@ void TestSorts(const vector<int> &numbers) {
 	sortResults.emplace_back("Selection sort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 
 	sort(sortResults.begin(), sortResults.end(), [](const SortResult &a, const SortResult &b){ return a.duration < b.duration; });
+	auto longestNameElement = std::max_element(sortResults.begin(), sortResults.end(), [](const SortResult &a, const SortResult &b) {
+		return a.sortName.length() < b.sortName.length();
+	});
+	int longestName = longestNameElement->sortName.length();
+
+	cout << fixed << setprecision(8);
 	for (const SortResult &sortResult : sortResults) {
-		printf("%26s time: %.8lf seconds\n", sortResult.sortName.c_str(), sortResult.duration);
+		cout << setw(longestName+4) << sortResult.sortName << " time: " << sortResult.duration << " seconds" << endl;
 	}
 	cout << endl;
 
