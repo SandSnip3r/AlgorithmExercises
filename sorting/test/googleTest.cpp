@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <deque>
 #include <random>
 #include <string>
 #include <vector>
@@ -35,6 +36,315 @@ bool operator<(const Distance &a, const Distance &b) {
 
 bool operator==(const Distance &a, const Distance &b) {
 	return (a.feet == b.feet && a.inches == b.inches);
+}
+
+template<typename NumType>
+class ArrayOfNumbersTest : public ::testing::Test {
+protected:
+	array<NumType,1> input1, expected1;
+	array<NumType,2> input2, expected2;
+	array<NumType,3> input3, expected3;
+	array<NumType,7> input4, expected4;
+	array<NumType,7> input5, expected5;
+	array<NumType,11> input6, expected6;
+	virtual void SetUp() {
+		input1 = {1};
+		input2 = {2, 1};
+		input3 = {1, 1, 1};
+		input4 = {1, 2, 3, 4, 5, 6, 7};
+		input5 = {7, 6, 5, 4, 3, 2, 1};
+		input6 = {10, 3, 9, 6, 7, 1, 2, 4, 5, 8, 11};
+		expected1 = {1};
+		expected2 = {1, 2};
+		expected3 = {1, 1, 1};
+		expected4 = {1, 2, 3, 4, 5, 6, 7};
+		expected5 = {1, 2, 3, 4, 5, 6, 7};
+		expected6 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+	}
+};
+
+typedef ::testing::Types<char, int, unsigned int, float, double> NumberTypes;
+TYPED_TEST_CASE(ArrayOfNumbersTest, NumberTypes);
+
+TYPED_TEST(ArrayOfNumbersTest, BogosortRandom) {
+	Bogosort::Sort(this->input1.begin(), this->input1.end(), Bogosort::ShuffleType::Random);
+	EXPECT_EQ(this->input1, this->expected1);
+	Bogosort::Sort(this->input2.begin(), this->input2.end(), Bogosort::ShuffleType::Random);
+	EXPECT_EQ(this->input2, this->expected2);
+	Bogosort::Sort(this->input3.begin(), this->input3.end(), Bogosort::ShuffleType::Random);
+	EXPECT_EQ(this->input3, this->expected3);
+	Bogosort::Sort(this->input4.begin(), this->input4.end(), Bogosort::ShuffleType::Random);
+	EXPECT_EQ(this->input4, this->expected4);
+	Bogosort::Sort(this->input5.begin(), this->input5.end(), Bogosort::ShuffleType::Random);
+	EXPECT_EQ(this->input5, this->expected5);
+	Bogosort::Sort(this->input6.begin(), this->input6.end(), Bogosort::ShuffleType::Random);
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, BogosortPermute) {
+	Bogosort::Sort(this->input1.begin(), this->input1.end(), Bogosort::ShuffleType::Permute);
+	EXPECT_EQ(this->input1, this->expected1);
+	Bogosort::Sort(this->input2.begin(), this->input2.end(), Bogosort::ShuffleType::Permute);
+	EXPECT_EQ(this->input2, this->expected2);
+	Bogosort::Sort(this->input3.begin(), this->input3.end(), Bogosort::ShuffleType::Permute);
+	EXPECT_EQ(this->input3, this->expected3);
+	Bogosort::Sort(this->input4.begin(), this->input4.end(), Bogosort::ShuffleType::Permute);
+	EXPECT_EQ(this->input4, this->expected4);
+	Bogosort::Sort(this->input5.begin(), this->input5.end(), Bogosort::ShuffleType::Permute);
+	EXPECT_EQ(this->input5, this->expected5);
+	Bogosort::Sort(this->input6.begin(), this->input6.end(), Bogosort::ShuffleType::Permute);
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, BubbleSort) {
+	BubbleSort::Sort(this->input1.begin(), this->input1.end());
+	EXPECT_EQ(this->input1, this->expected1);
+	BubbleSort::Sort(this->input2.begin(), this->input2.end());
+	EXPECT_EQ(this->input2, this->expected2);
+	BubbleSort::Sort(this->input3.begin(), this->input3.end());
+	EXPECT_EQ(this->input3, this->expected3);
+	BubbleSort::Sort(this->input4.begin(), this->input4.end());
+	EXPECT_EQ(this->input4, this->expected4);
+	BubbleSort::Sort(this->input5.begin(), this->input5.end());
+	EXPECT_EQ(this->input5, this->expected5);
+	BubbleSort::Sort(this->input6.begin(), this->input6.end());
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, Heapsort) {
+	Heapsort::Sort(this->input1.begin(), this->input1.end());
+	EXPECT_EQ(this->input1, this->expected1);
+	Heapsort::Sort(this->input2.begin(), this->input2.end());
+	EXPECT_EQ(this->input2, this->expected2);
+	Heapsort::Sort(this->input3.begin(), this->input3.end());
+	EXPECT_EQ(this->input3, this->expected3);
+	Heapsort::Sort(this->input4.begin(), this->input4.end());
+	EXPECT_EQ(this->input4, this->expected4);
+	Heapsort::Sort(this->input5.begin(), this->input5.end());
+	EXPECT_EQ(this->input5, this->expected5);
+	Heapsort::Sort(this->input6.begin(), this->input6.end());
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, InsertionSort) {
+	InsertionSort::Sort(this->input1.begin(), this->input1.end());
+	EXPECT_EQ(this->input1, this->expected1);
+	InsertionSort::Sort(this->input2.begin(), this->input2.end());
+	EXPECT_EQ(this->input2, this->expected2);
+	InsertionSort::Sort(this->input3.begin(), this->input3.end());
+	EXPECT_EQ(this->input3, this->expected3);
+	InsertionSort::Sort(this->input4.begin(), this->input4.end());
+	EXPECT_EQ(this->input4, this->expected4);
+	InsertionSort::Sort(this->input5.begin(), this->input5.end());
+	EXPECT_EQ(this->input5, this->expected5);
+	InsertionSort::Sort(this->input6.begin(), this->input6.end());
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, Introsort) {
+	Introsort::Sort(this->input1.begin(), this->input1.end());
+	EXPECT_EQ(this->input1, this->expected1);
+	Introsort::Sort(this->input2.begin(), this->input2.end());
+	EXPECT_EQ(this->input2, this->expected2);
+	Introsort::Sort(this->input3.begin(), this->input3.end());
+	EXPECT_EQ(this->input3, this->expected3);
+	Introsort::Sort(this->input4.begin(), this->input4.end());
+	EXPECT_EQ(this->input4, this->expected4);
+	Introsort::Sort(this->input5.begin(), this->input5.end());
+	EXPECT_EQ(this->input5, this->expected5);
+	Introsort::Sort(this->input6.begin(), this->input6.end());
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, ExtraSpaceMergeSort) {
+	MergeSort::Sort(this->input1.begin(), this->input1.end(), MergeSort::MergeType::ExtraSpace);
+	EXPECT_EQ(this->input1, this->expected1);
+	MergeSort::Sort(this->input2.begin(), this->input2.end(), MergeSort::MergeType::ExtraSpace);
+	EXPECT_EQ(this->input2, this->expected2);
+	MergeSort::Sort(this->input3.begin(), this->input3.end(), MergeSort::MergeType::ExtraSpace);
+	EXPECT_EQ(this->input3, this->expected3);
+	MergeSort::Sort(this->input4.begin(), this->input4.end(), MergeSort::MergeType::ExtraSpace);
+	EXPECT_EQ(this->input4, this->expected4);
+	MergeSort::Sort(this->input5.begin(), this->input5.end(), MergeSort::MergeType::ExtraSpace);
+	EXPECT_EQ(this->input5, this->expected5);
+	MergeSort::Sort(this->input6.begin(), this->input6.end(), MergeSort::MergeType::ExtraSpace);
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, InPlaceMergeSort) {
+	MergeSort::Sort(this->input1.begin(), this->input1.end(), MergeSort::MergeType::InPlace);
+	EXPECT_EQ(this->input1, this->expected1);
+	MergeSort::Sort(this->input2.begin(), this->input2.end(), MergeSort::MergeType::InPlace);
+	EXPECT_EQ(this->input2, this->expected2);
+	MergeSort::Sort(this->input3.begin(), this->input3.end(), MergeSort::MergeType::InPlace);
+	EXPECT_EQ(this->input3, this->expected3);
+	MergeSort::Sort(this->input4.begin(), this->input4.end(), MergeSort::MergeType::InPlace);
+	EXPECT_EQ(this->input4, this->expected4);
+	MergeSort::Sort(this->input5.begin(), this->input5.end(), MergeSort::MergeType::InPlace);
+	EXPECT_EQ(this->input5, this->expected5);
+	MergeSort::Sort(this->input6.begin(), this->input6.end(), MergeSort::MergeType::InPlace);
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, Quicksort) {
+	Quicksort::Sort(this->input1.begin(), this->input1.end());
+	EXPECT_EQ(this->input1, this->expected1);
+	Quicksort::Sort(this->input2.begin(), this->input2.end());
+	EXPECT_EQ(this->input2, this->expected2);
+	Quicksort::Sort(this->input3.begin(), this->input3.end());
+	EXPECT_EQ(this->input3, this->expected3);
+	Quicksort::Sort(this->input4.begin(), this->input4.end());
+	EXPECT_EQ(this->input4, this->expected4);
+	Quicksort::Sort(this->input5.begin(), this->input5.end());
+	EXPECT_EQ(this->input5, this->expected5);
+	Quicksort::Sort(this->input6.begin(), this->input6.end());
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+TYPED_TEST(ArrayOfNumbersTest, SelectionSort) {
+	SelectionSort::Sort(this->input1.begin(), this->input1.end());
+	EXPECT_EQ(this->input1, this->expected1);
+	SelectionSort::Sort(this->input2.begin(), this->input2.end());
+	EXPECT_EQ(this->input2, this->expected2);
+	SelectionSort::Sort(this->input3.begin(), this->input3.end());
+	EXPECT_EQ(this->input3, this->expected3);
+	SelectionSort::Sort(this->input4.begin(), this->input4.end());
+	EXPECT_EQ(this->input4, this->expected4);
+	SelectionSort::Sort(this->input5.begin(), this->input5.end());
+	EXPECT_EQ(this->input5, this->expected5);
+	SelectionSort::Sort(this->input6.begin(), this->input6.end());
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
+template<typename NumType>
+class DequeOfNumbersTest : public ::testing::Test {
+protected:
+	vector<deque<NumType>> input;
+	vector<deque<NumType>> expected;
+	virtual void SetUp() {
+		for (auto i : { deque<NumType>{1},
+										deque<NumType>{2, 1},
+										deque<NumType>{1, 1, 1},
+										deque<NumType>{1, 2, 3, 4, 5, 6, 7},
+										deque<NumType>{7, 6, 5, 4, 3, 2, 1},
+										deque<NumType>{10, 3, 9, 6, 7, 1, 2, 4, 5, 8, 11} }) {
+			input.emplace_back(i);
+			sort(i.begin(), i.end());
+			expected.emplace_back(i);
+		}
+		CreateLongRandomDeque();
+	}
+	void CreateLongRandomDeque() {
+		random_device rd;
+		vector<unsigned int> seeds;
+		for (unsigned int i=0; i<mt19937::state_size; ++i) {
+			seeds.emplace_back(rd());
+		}
+		seed_seq s(seeds.begin(),seeds.end());
+		mt19937 eng(s);
+		uniform_int_distribution<int> numOfNumbersDist(1000,9999);
+		uniform_int_distribution<int> numberDist(0,1000000000);
+
+		deque<NumType> numbers;
+
+		int numOfNumbers = numOfNumbersDist(eng);
+		for (int i=0; i<numOfNumbers; ++i) {
+			numbers.emplace_back(numberDist(eng));
+		}
+
+		input.emplace_back(numbers);
+		sort(numbers.begin(), numbers.end());
+		expected.emplace_back(numbers);
+	}
+};
+
+typedef ::testing::Types<char, int, unsigned int, float, double> NumberTypes;
+TYPED_TEST_CASE(DequeOfNumbersTest, NumberTypes);
+
+TYPED_TEST(DequeOfNumbersTest, BogosortRandom) {
+	//Dont bother testing bogosort for large lists
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		if (this->input.at(i).size() < 12) {
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Random);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
+		}
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, BogosortPermute) {
+	//Dont bother testing bogosort for large lists
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		if (this->input.at(i).size() < 12) {
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Permute);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
+		}
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, BubbleSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		BubbleSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, Heapsort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		Heapsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, InsertionSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		InsertionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, Introsort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		Introsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, ExtraSpaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::ExtraSpace);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, InPlaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::InPlace);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, Quicksort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		Quicksort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(DequeOfNumbersTest, SelectionSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		SelectionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
 }
 
 template<typename NumType>
@@ -86,9 +396,9 @@ TYPED_TEST(VectorOfNumbersTest, BogosortRandom) {
 	//Dont bother testing bogosort for large lists
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		if (this->input.at(i).size() < 12) {
-			auto inputCopy = this->input.at(i);
-			Bogosort::Sort(inputCopy.begin(), inputCopy.end(), Bogosort::ShuffleType::Random);
-			EXPECT_EQ(inputCopy, this->expected.at(i));
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Random);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
 		}
 	}
 }
@@ -97,66 +407,74 @@ TYPED_TEST(VectorOfNumbersTest, BogosortPermute) {
 	//Dont bother testing bogosort for large lists
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		if (this->input.at(i).size() < 12) {
-			auto inputCopy = this->input.at(i);
-			Bogosort::Sort(inputCopy.begin(), inputCopy.end(), Bogosort::ShuffleType::Permute);
-			EXPECT_EQ(inputCopy, this->expected.at(i));
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Permute);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
 		}
 	}
 }
 
 TYPED_TEST(VectorOfNumbersTest, BubbleSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		BubbleSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		BubbleSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TYPED_TEST(VectorOfNumbersTest, Heapsort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Heapsort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Heapsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TYPED_TEST(VectorOfNumbersTest, InsertionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		InsertionSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		InsertionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TYPED_TEST(VectorOfNumbersTest, Introsort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Introsort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Introsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
-TYPED_TEST(VectorOfNumbersTest, MergeSort) {
+TYPED_TEST(VectorOfNumbersTest, ExtraSpaceMergeSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		MergeSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::ExtraSpace);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(VectorOfNumbersTest, InPlaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::InPlace);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TYPED_TEST(VectorOfNumbersTest, Quicksort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Quicksort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Quicksort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TYPED_TEST(VectorOfNumbersTest, SelectionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		SelectionSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		SelectionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
@@ -212,9 +530,9 @@ protected:
 TEST_F(VectorOfStringsTest, BogosortRandom) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		if (this->input.at(i).size() < 12) {
-			auto inputCopy = this->input.at(i);
-			Bogosort::Sort(inputCopy.begin(), inputCopy.end(), Bogosort::ShuffleType::Random, this->StringComp);
-			EXPECT_EQ(inputCopy, this->expected.at(i));
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Random, this->StringComp);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
 		}
 	}
 }
@@ -222,66 +540,74 @@ TEST_F(VectorOfStringsTest, BogosortRandom) {
 TEST_F(VectorOfStringsTest, BogosortPermute) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		if (this->input.at(i).size() < 12) {
-			auto inputCopy = this->input.at(i);
-			Bogosort::Sort(inputCopy.begin(), inputCopy.end(), Bogosort::ShuffleType::Permute, this->StringComp);
-			EXPECT_EQ(inputCopy, this->expected.at(i));
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Permute, this->StringComp);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
 		}
 	}
 }
 
 TEST_F(VectorOfStringsTest, BubbleSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		BubbleSort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		BubbleSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfStringsTest, Heapsort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Heapsort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Heapsort::Sort(this->input.at(i).begin(), this->input.at(i).end(), this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfStringsTest, InsertionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		InsertionSort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		InsertionSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfStringsTest, Introsort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Introsort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Introsort::Sort(this->input.at(i).begin(), this->input.at(i).end(), this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
-TEST_F(VectorOfStringsTest, MergeSort) {
+TEST_F(VectorOfStringsTest, ExtraSpaceMergeSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		MergeSort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::ExtraSpace, this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TEST_F(VectorOfStringsTest, InPlaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::InPlace, this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfStringsTest, Quicksort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Quicksort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Quicksort::Sort(this->input.at(i).begin(), this->input.at(i).end(), this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfStringsTest, SelectionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		SelectionSort::Sort(inputCopy.begin(), inputCopy.end(), this->StringComp);
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		SelectionSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
@@ -328,9 +654,9 @@ protected:
 TEST_F(VectorOfDistancesTest, BogosortRandom) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		if (this->input.at(i).size() < 12) {
-			auto inputCopy = this->input.at(i);
-			Bogosort::Sort(inputCopy.begin(), inputCopy.end(), Bogosort::ShuffleType::Random);
-			EXPECT_EQ(inputCopy, this->expected.at(i));
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Random);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
 		}
 	}
 }
@@ -338,65 +664,73 @@ TEST_F(VectorOfDistancesTest, BogosortRandom) {
 TEST_F(VectorOfDistancesTest, BogosortPermute) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		if (this->input.at(i).size() < 12) {
-			auto inputCopy = this->input.at(i);
-			Bogosort::Sort(inputCopy.begin(), inputCopy.end(), Bogosort::ShuffleType::Permute);
-			EXPECT_EQ(inputCopy, this->expected.at(i));
+			// auto inputCopy = this->input.at(i);
+			Bogosort::Sort(this->input.at(i).begin(), this->input.at(i).end(), Bogosort::ShuffleType::Permute);
+			EXPECT_EQ(this->input.at(i), this->expected.at(i));
 		}
 	}
 }
 
 TEST_F(VectorOfDistancesTest, BubbleSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		BubbleSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		BubbleSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfDistancesTest, Heapsort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Heapsort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Heapsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfDistancesTest, InsertionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		InsertionSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		InsertionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfDistancesTest, Introsort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Introsort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Introsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
-TEST_F(VectorOfDistancesTest, MergeSort) {
+TEST_F(VectorOfDistancesTest, ExtraSpaceMergeSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		MergeSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::ExtraSpace);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TEST_F(VectorOfDistancesTest, InPlaceMergeSort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		MergeSort::Sort(this->input.at(i).begin(), this->input.at(i).end(), MergeSort::MergeType::InPlace);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfDistancesTest, Quicksort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		Quicksort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		Quicksort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
 
 TEST_F(VectorOfDistancesTest, SelectionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
-		auto inputCopy = this->input.at(i);
-		SelectionSort::Sort(inputCopy.begin(), inputCopy.end());
-		EXPECT_EQ(inputCopy, this->expected.at(i));
+		// auto inputCopy = this->input.at(i);
+		SelectionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
