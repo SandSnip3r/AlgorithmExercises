@@ -20,7 +20,8 @@
   - In-place merge method also implemented just in case memory is a concern
     - Speed degrades to O(n^2)
 - Selection sort
+- Timsort
+  - No galloping yet
 
 #### Planned algorithms
-- Timsort
 - Smoothsort
