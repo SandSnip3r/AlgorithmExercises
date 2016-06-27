@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <functional>
 #include <vector>
 
 #ifndef _MERGESORT_HPP

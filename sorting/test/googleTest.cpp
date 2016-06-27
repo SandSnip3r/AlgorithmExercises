@@ -14,6 +14,7 @@
 #include "mergeSort.hpp"
 #include "quicksort.hpp"
 #include "selectionSort.hpp"
+#include "timsort.hpp"
 
 using namespace std;
 
@@ -216,6 +217,21 @@ TYPED_TEST(ArrayOfNumbersTest, SelectionSort) {
 	EXPECT_EQ(this->input6, this->expected6);
 }
 
+TYPED_TEST(ArrayOfNumbersTest, Timsort) {
+	Timsort::Sort(this->input1.begin(), this->input1.end());
+	EXPECT_EQ(this->input1, this->expected1);
+	Timsort::Sort(this->input2.begin(), this->input2.end());
+	EXPECT_EQ(this->input2, this->expected2);
+	Timsort::Sort(this->input3.begin(), this->input3.end());
+	EXPECT_EQ(this->input3, this->expected3);
+	Timsort::Sort(this->input4.begin(), this->input4.end());
+	EXPECT_EQ(this->input4, this->expected4);
+	Timsort::Sort(this->input5.begin(), this->input5.end());
+	EXPECT_EQ(this->input5, this->expected5);
+	Timsort::Sort(this->input6.begin(), this->input6.end());
+	EXPECT_EQ(this->input6, this->expected6);
+}
+
 template<typename NumType>
 class DequeOfNumbersTest : public ::testing::Test {
 protected:
@@ -347,6 +363,14 @@ TYPED_TEST(DequeOfNumbersTest, SelectionSort) {
 	}
 }
 
+TYPED_TEST(DequeOfNumbersTest, Timsort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		Timsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
 template<typename NumType>
 class VectorOfNumbersTest : public ::testing::Test {
 protected:
@@ -474,6 +498,14 @@ TYPED_TEST(VectorOfNumbersTest, SelectionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		// auto inputCopy = this->input.at(i);
 		SelectionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TYPED_TEST(VectorOfNumbersTest, Timsort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		Timsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
 		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }
@@ -611,6 +643,14 @@ TEST_F(VectorOfStringsTest, SelectionSort) {
 	}
 }
 
+TEST_F(VectorOfStringsTest, Timsort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		Timsort::Sort(this->input.at(i).begin(), this->input.at(i).end(), this->StringComp);
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
 class VectorOfDistancesTest : public ::testing::Test {
 protected:
 	vector<vector<Distance>> input;
@@ -731,6 +771,14 @@ TEST_F(VectorOfDistancesTest, SelectionSort) {
 	for (unsigned int i=0; i<this->input.size(); ++i) {
 		// auto inputCopy = this->input.at(i);
 		SelectionSort::Sort(this->input.at(i).begin(), this->input.at(i).end());
+		EXPECT_EQ(this->input.at(i), this->expected.at(i));
+	}
+}
+
+TEST_F(VectorOfDistancesTest, Timsort) {
+	for (unsigned int i=0; i<this->input.size(); ++i) {
+		// auto inputCopy = this->input.at(i);
+		Timsort::Sort(this->input.at(i).begin(), this->input.at(i).end());
 		EXPECT_EQ(this->input.at(i), this->expected.at(i));
 	}
 }

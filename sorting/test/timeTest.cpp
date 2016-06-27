@@ -11,14 +11,10 @@
 #include "quicksort.hpp"
 #include "selectionSort.hpp"
 #include "timeUtility.hpp"
+#include "timsort.hpp"
 
 using namespace std;
 typedef chrono::nanoseconds DurationType;
-
-struct DataRange {
-	int first;
-	int last;
-};
 
 void TestSorts(const vector<int> &numbers);
 void STDSortTest(vector<int> numbers, DurationType *duration);
@@ -32,8 +28,8 @@ void MergeSortExtraSpaceTest(vector<int> numbers, DurationType *duration);
 void MergeSortInPlaceTest(vector<int> numbers, DurationType *duration);
 void QuicksortTest(vector<int> numbers, DurationType *duration);
 void SelectionSortTest(vector<int> numbers, DurationType *duration);
+void TimsortTest(vector<int> numbers, DurationType *duration);
 bool ComparisonFuntion(const int &a, const int &b);
-void CreateRandomData(vector<int> *numbers, int dataLength, DataRange dataRange);
 
 int main() {
 	const int testLength = 100000;
@@ -190,6 +186,8 @@ void TestSorts(const vector<int> &numbers) {
 	sortResults.emplace_back("Quicksort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 	SelectionSortTest(numbers, &duration);
 	sortResults.emplace_back("Selection sort",chrono::duration_cast<chrono::duration<double>>(duration).count());
+	TimsortTest(numbers, &duration);
+	sortResults.emplace_back("Timsort",chrono::duration_cast<chrono::duration<double>>(duration).count());
 
 	sort(sortResults.begin(), sortResults.end(), [](const SortResult &a, const SortResult &b){ return a.duration < b.duration; });
 	auto longestNameElement = std::max_element(sortResults.begin(), sortResults.end(), [](const SortResult &a, const SortResult &b) {
@@ -307,6 +305,16 @@ void SelectionSortTest(vector<int> numbers, DurationType *duration) {
 	}
 	if (!is_sorted(numbers.begin(), numbers.end())) {
 		throw runtime_error("Selection sort failed!");
+	}
+}
+
+void TimsortTest(vector<int> numbers, DurationType *duration) {
+	{
+		Timer<DurationType> timer(duration);
+		Timsort::Sort(numbers.begin(), numbers.end());
+	}
+	if (!is_sorted(numbers.begin(), numbers.end())) {
+		throw runtime_error("Timsort failed!");
 	}
 }
 
