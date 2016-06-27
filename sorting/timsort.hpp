@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iostream>
 #include <stack>
 #include "insertionSort.hpp"
 #include "mergeSort.hpp"
@@ -17,10 +16,10 @@ namespace Timsort {
 	};
 
 	size_t CalculateMinrun(size_t length) {
-		//The final algorithm takes the six most significant bits
-		//	of the size of the array, adds one if any of the
-		//	remaining bits are set, and uses that result as the minrun.
-		//	This algorithm works for all arrays, including those smaller than 64.
+		//Take the six most significant bits of the size of the array,
+		//	adds one if any of the remaining bits are set, and uses
+		//	that result as the minrun. This algorithm works for all arrays,
+		//	including those smaller than 64.
 		size_t mostSignificant6 = length;
 		size_t extraBit = 0;
 		while (mostSignificant6 >= (1<<6)) {
@@ -34,25 +33,77 @@ namespace Timsort {
 	}
 
 	template<class RandomIt, class Compare>
-	size_t FindExistingRunLength(RandomIt begin, Compare Comp) {
+	size_t FindExistingRunLength(RandomIt begin, RandomIt end, Compare Comp) {
+		size_t length = end-begin;
+		if (length < 2) {
+			return length;
+		}
 		size_t runLength = 2; //guaranteed
-		if (!Comp(*(begin+1), *(begin))) {
+		RandomIt runIt = begin;
+		if (!Comp(*(runIt+1), *(runIt))) {
 			//Increasing run
-			while (!Comp(*(begin+runLength), *(begin+runLength-1))) {
+			runIt += runLength;
+			while (runIt != end && !Comp(*(runIt), *(runIt-1))) {
 				//Grow the run as long as the elements are increasing
+				++runIt;
 				++runLength;
 			}
 		} else {
 			//Strictly decreasing run
-			while (Comp(*(begin+runLength), *(begin+runLength-1))) {
+			runIt += runLength;
+			while (runIt != end && Comp(*(runIt), *(runIt-1))) {
 				//Grow the run as long as the elements are strictly decreasing
+				++runIt;
 				++runLength;
 			}
-			// std::cout << "Reversing decreasing run of length " << runLength << std::endl;
 			//Since they were strictly decreasing, we can easily reverse them to get an increasing run
-			std::reverse(begin, (begin+runLength));
+			std::reverse(begin, runIt);
 		}
 		return runLength;
+	}
+
+	template<class RandomIt, class Compare>
+	void MaintainStackInvariants(std::stack<Run<RandomIt>> *runStack, Compare Comp) {
+		while (runStack->size() >= 3) {
+			Run<RandomIt> a = runStack->top();
+			runStack->pop();
+			Run<RandomIt> b = runStack->top();
+			runStack->pop();
+			Run<RandomIt> c = runStack->top();
+			runStack->pop();
+
+			if ((a.length<=(b.length+c.length)) || (b.length<=c.length)) {
+				//Invariant fails
+				if (a.length < c.length) {
+					//Merge a and b
+					size_t totalLength = a.length+b.length;
+					MergeSort::ExtraSpaceMerge(b.begin, b.begin+b.length, b.begin+totalLength, Comp);
+					runStack->push(c);
+					runStack->emplace(b.begin, totalLength);
+				} else {
+					//Merge b and c
+					//	ties favor c
+					size_t totalLength = b.length+c.length;
+					MergeSort::ExtraSpaceMerge(c.begin, c.begin+c.length, c.begin+totalLength, Comp);
+					runStack->emplace(c.begin, totalLength);
+					runStack->push(a);
+				}
+			}
+		}
+	}
+
+	template<class RandomIt, class Compare>
+	void MergeRemainingOnStack(std::stack<Run<RandomIt>> *runStack, Compare Comp) {
+		while (runStack->size() >= 2) {
+			Run<RandomIt> a = runStack->top();
+			runStack->pop();
+			Run<RandomIt> b = runStack->top();
+			runStack->pop();
+
+			size_t totalLength = a.length+b.length;
+			MergeSort::ExtraSpaceMerge(b.begin, b.begin+b.length, b.begin+totalLength, Comp);
+			runStack->emplace(b.begin, totalLength);
+		}
 	}
 
 	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
@@ -63,85 +114,31 @@ namespace Timsort {
 		std::stack<Run<RandomIt>> runStack;
 
 		size_t runStart = 0;
-		size_t runLength = 0;
-		while (runStart < length-1) {
-			//Creating new run
-			runLength = FindExistingRunLength(begin+runStart, Comp);
 
+		while (runStart < length) {
+			//More array remaining
+			size_t runLength = FindExistingRunLength(begin+runStart, end, Comp);
 			if (runLength < minRunLength) {
-				//The run we found isnt big enough
-				if (runStart+minRunLength > length) {
-					//The run is all the way up to the end
-					runLength = length - runStart;
-				} else {
-					//The run is set equal to the min length
+				//Run isnt long enough
+				if ((runStart+minRunLength) < length) {
+					//There are at least minRunLength elements remaining
 					runLength = minRunLength;
-				}
-				// std::cout << "Length " << (runStart+runLength)-(runStart) << std::endl;
-				//Use insertion sort becase the run wasnt long enough
-				InsertionSort::Sort((begin+runStart), (begin+runStart+runLength), Comp);
-			}
-
-			//New run is complete, put it on the stack
-			// std::cout << "Pushing new run starting at " << *(begin+runStart) << " len " << runLength << std::endl;
-			runStack.emplace((begin+runStart), runLength);
-			//Merge any on the top of the stack if necessary
-			//	this point of merging makes it more likely that runs will be merged
-			//	while they are still in cache.
-			// std::cout << "Pre-while stack size " << runStack.size() << std::endl;
-			while (runStack.size() >= 3) {
-				Run<RandomIt> a = runStack.top();
-				runStack.pop();
-				Run<RandomIt> b = runStack.top();
-				runStack.pop();
-				Run<RandomIt> c = runStack.top();
-				runStack.pop();
-				if (a.length + b.length > c.length) {
-					size_t newLength = c.length+b.length;
-					// std::cout << "Should merge b and c. B:" << *(b.begin) << "," << b.length << " & C:" << *(c.begin) << "," << c.length << std::endl;
-					MergeSort::ExtraSpaceMerge(c.begin, c.begin+c.length, c.begin+newLength, Comp);
-					if (!std::is_sorted(c.begin, c.begin+newLength, Comp)) {
-						// std::cout << "(b and c) merge failed!" << std::endl;
-					}
-					runStack.emplace(c.begin, newLength);
-					runStack.push(a);
-				} else if (a.length > b.length) {
-					size_t newLength = b.length+a.length;
-					// std::cout << "Should merge a and b. A:" << *(a.begin) << "," << a.length << " & B:" << *(b.begin) << "," << b.length << std::endl;
-					MergeSort::ExtraSpaceMerge(b.begin, b.begin+b.length, b.begin+newLength, Comp);
-					if (!std::is_sorted(b.begin, b.begin+newLength, Comp)) {
-						// std::cout << "(a and b) merge failed!" << std::endl;
-					}
-					runStack.push(c);
-					runStack.emplace(b.begin, newLength);
 				} else {
-					//Condition not met
-					// std::cout << "Conditions not met" << std::endl;
-					runStack.push(c);
-					runStack.push(b);
-					runStack.push(a);
-					break;
+					//There are less than minRunLength elements remaining
+					runLength = length-runStart;
 				}
+				//Use insertion sort becase the run wasnt long enough
+				InsertionSort::Sort(begin+runStart, begin+runStart+runLength, Comp);
 			}
-			// std::cout << "Post-while stack size " << runStack.size() << std::endl;
-			//The next run starts at the end of this one
+			//Push the current run onto the stack
+			runStack.emplace(begin+runStart, runLength);
+			//Ensure the stack invariants are maintained
+			MaintainStackInvariants(&runStack, Comp);
+			//Increase the start to after this run
 			runStart += runLength;
 		}
-		if (runStack.empty()) {
-			// std::cout << "Seems all went well" << std::endl;
-		} else {
-			// std::cout << "Dumping run stack" << std::endl;
-			while (runStack.size() >= 2) {
-				//Merge everything remaining
-				Run<RandomIt> a = runStack.top();
-				runStack.pop();
-				Run<RandomIt> b = runStack.top();
-				runStack.pop();
-				size_t newLength = a.length+b.length;
-				MergeSort::ExtraSpaceMerge(b.begin, b.begin+b.length, b.begin+newLength, Comp);
-				runStack.emplace(b.begin, newLength);
-			}
-		}
+
+		MergeRemainingOnStack(&runStack, Comp);
 	}
 }
 
