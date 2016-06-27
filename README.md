@@ -17,6 +17,8 @@
 - Bubble sort
 - Merge sort
   - Implemented using a bottom-up approach (non-recursive)
+  - In-place merge method also implemented just in case memory is a concern
+    - Speed degrades to O(n^2)
 - Selection sort
 
 #### Planned algorithms
