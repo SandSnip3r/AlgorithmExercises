@@ -1,27 +1,30 @@
-#include <algorithm>
-#include <vector>
+#ifndef INSERTIONSORT_HPP
+#define INSERTIONSORT_HPP 1
 
-#ifndef _INSERTIONSORT_HPP
-#define _INSERTIONSORT_HPP 1
+#include <algorithm>
+#include <functional>
+#include <iterator>
+#include <vector>
 
 namespace InsertionSort {
 
-	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
-	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
-		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+	template<class RandomIt, class Compare = std::less<>>
+	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
+		if (std::distance(begin,end) < 2) {
+			return;
+		}
 
-		DiffType length = end-first;
-		
-		for (unsigned int i=1; i<length; ++i) {
-			ValueType val = *(first+i);
-			int newPos = i;
-			while (newPos > 0 && Comp(val, *(first+newPos-1))) {
-				--newPos;
-			}
-			std::rotate(first+newPos, first+i, first+i+1);
+		using RevIt = std::reverse_iterator<RandomIt>;
+
+		for (RandomIt firstUnsorted=std::next(begin); firstUnsorted!=end; ++firstUnsorted) {
+			//Find the first element where 'firstUnsorted' is not less than it
+			const RandomIt insertionPoint = std::find_if_not(RevIt(firstUnsorted), RevIt(begin), [=](const auto &element) {
+				return Comp(*firstUnsorted,element);
+			}).base();
+			//Rotate to move firstUnsorted into place
+			std::rotate(insertionPoint, firstUnsorted, std::next(firstUnsorted));
 		}
 	}
-}
+} //namespace InsertionSort
 
-#endif //_INSERTIONSORT_HPP
+#endif //INSERTIONSORT_HPP

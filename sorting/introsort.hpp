@@ -1,50 +1,54 @@
-#include <cmath>
+#ifndef INTROSORT_HPP
+#define INTROSORT_HPP 1
+
 #include <algorithm>
+#include <cmath>
+#include <iterator>
 #include "heapsort.hpp"
 #include "insertionSort.hpp"
 #include "quicksort.hpp"
 
-#ifndef _INTROSORT_HPP
-#define _INTROSORT_HPP 1
-
 namespace Introsort {
 
-  enum { SortThreshold = 16 };
+  const size_t SORT_THRESHOLD = 16;
 
-	template<class RandomIt, class SizeType, class Compare>
-	void SortLimitedDepth(RandomIt first, RandomIt end, SizeType depthLimit, Compare Comp) {
+	template<class RandomIt, class Compare>
+	void SortLimitedDepth(RandomIt begin, RandomIt end, int depthLimit, Compare Comp) {
 		//This method uses a while loop to continually sort the left
 		//	half of the list and recursively sort the right,
 		//	rather than recursively sorting both
-		while ((end-first) > static_cast<typename std::iterator_traits<RandomIt>::difference_type>(SortThreshold)) {
+		while (static_cast<size_t>(std::distance(begin,end)) > SORT_THRESHOLD) {
 			//While the length of our list is greater than the specified threshold
 			if (depthLimit == 0) {
 				//Hit our depth limit(pivot selection was too unbalanced), do heapsort now
-				Heapsort::Sort(first, end, Comp);
+				Heapsort::Sort(begin, end, Comp);
 				return;
 			}
 			--depthLimit;
 			//Didnt hit the depth limit yet, continue quicksort
-			RandomIt partition = Quicksort::Partition(first, end, Comp);
+			RandomIt partition = Quicksort::Partition(begin, end, Comp);
 			SortLimitedDepth(partition, end, depthLimit, Comp);
 			end = partition;
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
-	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
-		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
+	template<class RandomIt, class Compare = std::less<>>
+	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
+		size_t length = std::distance(begin,end);
 
-		DiffType length = end-first;
+		if (length < 2) {
+			return;
+		}
+
 		int maxDepth = 2 * static_cast<int>(log2(length));
 
-		//Use Quicksort unless if it's repeatedly too unbalanced
+		//Use Quicksort until it's repeatedly too unbalanced
 		//	(maxDepth prevents too many recursions)
-		SortLimitedDepth(first, end, maxDepth, Comp);
-		//This leaves unsorted chunks of no more than size 'SortThreshold',
+		SortLimitedDepth(begin, end, maxDepth, Comp);
+		//This leaves unsorted chunks of no more than size 'SORT_THRESHOLD',
 		//	insertion sort should do well here
-		InsertionSort::Sort(first, end, Comp);
+		InsertionSort::Sort(begin, end, Comp);
 	}
-}
+} //namespace Introsort
 
-#endif //_INTROSORT_HPP
+#endif //INTROSORT_HPP
