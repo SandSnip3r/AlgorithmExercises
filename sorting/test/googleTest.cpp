@@ -42,6 +42,7 @@ bool operator==(const Distance &a, const Distance &b) {
 template<typename NumType>
 class ArrayOfNumbersTest : public ::testing::Test {
 protected:
+	array<NumType,0> input0, expected0;
 	array<NumType,1> input1, expected1;
 	array<NumType,2> input2, expected2;
 	array<NumType,3> input3, expected3;
@@ -49,12 +50,14 @@ protected:
 	array<NumType,7> input5, expected5;
 	array<NumType,11> input6, expected6;
 	virtual void SetUp() {
+		input0 = {};
 		input1 = {1};
 		input2 = {2, 1};
 		input3 = {1, 1, 1};
 		input4 = {1, 2, 3, 4, 5, 6, 7};
 		input5 = {7, 6, 5, 4, 3, 2, 1};
 		input6 = {10, 3, 9, 6, 7, 1, 2, 4, 5, 8, 11};
+		expected0 = {};
 		expected1 = {1};
 		expected2 = {1, 2};
 		expected3 = {1, 1, 1};
@@ -68,6 +71,8 @@ typedef ::testing::Types<char, int, unsigned int, float, double> NumberTypes;
 TYPED_TEST_CASE(ArrayOfNumbersTest, NumberTypes);
 
 TYPED_TEST(ArrayOfNumbersTest, BogosortRandom) {
+	Bogosort::Sort(this->input0.begin(), this->input0.end(), Bogosort::ShuffleType::Random);
+	EXPECT_EQ(this->input0, this->expected0);
 	Bogosort::Sort(this->input1.begin(), this->input1.end(), Bogosort::ShuffleType::Random);
 	EXPECT_EQ(this->input1, this->expected1);
 	Bogosort::Sort(this->input2.begin(), this->input2.end(), Bogosort::ShuffleType::Random);
@@ -83,6 +88,8 @@ TYPED_TEST(ArrayOfNumbersTest, BogosortRandom) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, BogosortPermute) {
+	Bogosort::Sort(this->input0.begin(), this->input0.end(), Bogosort::ShuffleType::Permute);
+	EXPECT_EQ(this->input0, this->expected0);
 	Bogosort::Sort(this->input1.begin(), this->input1.end(), Bogosort::ShuffleType::Permute);
 	EXPECT_EQ(this->input1, this->expected1);
 	Bogosort::Sort(this->input2.begin(), this->input2.end(), Bogosort::ShuffleType::Permute);
@@ -98,6 +105,8 @@ TYPED_TEST(ArrayOfNumbersTest, BogosortPermute) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, BubbleSort) {
+	BubbleSort::Sort(this->input0.begin(), this->input0.end());
+	EXPECT_EQ(this->input0, this->expected0);
 	BubbleSort::Sort(this->input1.begin(), this->input1.end());
 	EXPECT_EQ(this->input1, this->expected1);
 	BubbleSort::Sort(this->input2.begin(), this->input2.end());
@@ -113,6 +122,8 @@ TYPED_TEST(ArrayOfNumbersTest, BubbleSort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, Heapsort) {
+	Heapsort::Sort(this->input0.begin(), this->input0.end());
+	EXPECT_EQ(this->input0, this->expected0);
 	Heapsort::Sort(this->input1.begin(), this->input1.end());
 	EXPECT_EQ(this->input1, this->expected1);
 	Heapsort::Sort(this->input2.begin(), this->input2.end());
@@ -128,6 +139,8 @@ TYPED_TEST(ArrayOfNumbersTest, Heapsort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, InsertionSort) {
+	InsertionSort::Sort(this->input0.begin(), this->input0.end());
+	EXPECT_EQ(this->input0, this->expected0);
 	InsertionSort::Sort(this->input1.begin(), this->input1.end());
 	EXPECT_EQ(this->input1, this->expected1);
 	InsertionSort::Sort(this->input2.begin(), this->input2.end());
@@ -143,6 +156,8 @@ TYPED_TEST(ArrayOfNumbersTest, InsertionSort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, Introsort) {
+	Introsort::Sort(this->input0.begin(), this->input0.end());
+	EXPECT_EQ(this->input0, this->expected0);
 	Introsort::Sort(this->input1.begin(), this->input1.end());
 	EXPECT_EQ(this->input1, this->expected1);
 	Introsort::Sort(this->input2.begin(), this->input2.end());
@@ -158,6 +173,8 @@ TYPED_TEST(ArrayOfNumbersTest, Introsort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, ExtraSpaceMergeSort) {
+	MergeSort::Sort(this->input0.begin(), this->input0.end(), MergeSort::MergeType::ExtraSpace);
+	EXPECT_EQ(this->input0, this->expected0);
 	MergeSort::Sort(this->input1.begin(), this->input1.end(), MergeSort::MergeType::ExtraSpace);
 	EXPECT_EQ(this->input1, this->expected1);
 	MergeSort::Sort(this->input2.begin(), this->input2.end(), MergeSort::MergeType::ExtraSpace);
@@ -173,6 +190,8 @@ TYPED_TEST(ArrayOfNumbersTest, ExtraSpaceMergeSort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, InPlaceMergeSort) {
+	MergeSort::Sort(this->input0.begin(), this->input0.end(), MergeSort::MergeType::InPlace);
+	EXPECT_EQ(this->input0, this->expected0);
 	MergeSort::Sort(this->input1.begin(), this->input1.end(), MergeSort::MergeType::InPlace);
 	EXPECT_EQ(this->input1, this->expected1);
 	MergeSort::Sort(this->input2.begin(), this->input2.end(), MergeSort::MergeType::InPlace);
@@ -188,6 +207,8 @@ TYPED_TEST(ArrayOfNumbersTest, InPlaceMergeSort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, Quicksort) {
+	Quicksort::Sort(this->input0.begin(), this->input0.end());
+	EXPECT_EQ(this->input0, this->expected0);
 	Quicksort::Sort(this->input1.begin(), this->input1.end());
 	EXPECT_EQ(this->input1, this->expected1);
 	Quicksort::Sort(this->input2.begin(), this->input2.end());
@@ -203,6 +224,8 @@ TYPED_TEST(ArrayOfNumbersTest, Quicksort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, SelectionSort) {
+	SelectionSort::Sort(this->input0.begin(), this->input0.end());
+	EXPECT_EQ(this->input0, this->expected0);
 	SelectionSort::Sort(this->input1.begin(), this->input1.end());
 	EXPECT_EQ(this->input1, this->expected1);
 	SelectionSort::Sort(this->input2.begin(), this->input2.end());
@@ -218,6 +241,8 @@ TYPED_TEST(ArrayOfNumbersTest, SelectionSort) {
 }
 
 TYPED_TEST(ArrayOfNumbersTest, Timsort) {
+	Timsort::Sort(this->input0.begin(), this->input0.end());
+	EXPECT_EQ(this->input0, this->expected0);
 	Timsort::Sort(this->input1.begin(), this->input1.end());
 	EXPECT_EQ(this->input1, this->expected1);
 	Timsort::Sort(this->input2.begin(), this->input2.end());
@@ -238,7 +263,8 @@ protected:
 	vector<deque<NumType>> input;
 	vector<deque<NumType>> expected;
 	virtual void SetUp() {
-		for (auto i : { deque<NumType>{1},
+		for (auto i : { deque<NumType>{},
+										deque<NumType>{1},
 										deque<NumType>{2, 1},
 										deque<NumType>{1, 1, 1},
 										deque<NumType>{1, 2, 3, 4, 5, 6, 7},
@@ -377,7 +403,8 @@ protected:
 	vector<vector<NumType>> input;
 	vector<vector<NumType>> expected;
 	virtual void SetUp() {
-		for (auto i : { vector<NumType>{1},
+		for (auto i : { vector<NumType>{},
+										vector<NumType>{1},
 										vector<NumType>{2, 1},
 										vector<NumType>{1, 1, 1},
 										vector<NumType>{1, 2, 3, 4, 5, 6, 7},
@@ -515,7 +542,8 @@ protected:
 	vector<vector<string>> input;
 	vector<vector<string>> expected;
 	virtual void SetUp() {
-		for (auto i : { vector<string>{"hey"},
+		for (auto i : { vector<string>{},
+										vector<string>{"hey"},
 										vector<string>{"z", "a"},
 										vector<string>{"z", "g", "s", "y", "e", "j", "a", "k", "p", "o"},
 										vector<string>{"abc", "abc", "abc", "abc", "abc", "abc", "abc"},
@@ -656,7 +684,10 @@ protected:
 	vector<vector<Distance>> input;
 	vector<vector<Distance>> expected;
 	virtual void SetUp() {
-		for (auto i : { vector<Distance>{ {1, 5.6789}, {2, 5.6789}, {3, 5.6789} },
+		for (auto i : { vector<Distance>{ },
+										vector<Distance>{ {123, 32.1} },
+										vector<Distance>{ {50, 3}, {50, 2} },
+										vector<Distance>{ {1, 5.6789}, {2, 5.6789}, {3, 5.6789} },
 										vector<Distance>{ {10, 10.123}, {10, 20.456}, {10, 30.789} },
 										vector<Distance>{ {2, 2.3}, {3, 2.3}, {2, 2.2} },
 										vector<Distance>{ {1, 100.5}, {1, 23.6363}, {9, 45634.22}, {9, 0.00001} } }) {
