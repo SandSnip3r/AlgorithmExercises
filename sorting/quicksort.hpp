@@ -1,12 +1,13 @@
-#include <algorithm>
-#include <vector>
+#ifndef QUICKSORT_HPP
+#define QUICKSORT_HPP 1
 
-#ifndef _QUICKSORT_HPP
-#define _QUICKSORT_HPP 1
+#include <algorithm>
+#include <iterator>
+#include <vector>
 
 namespace Quicksort {
 	template<class RandomIt, class Compare>
-	RandomIt GetMedian(RandomIt first, RandomIt middle, RandomIt last, Compare Comp) {
+	RandomIt GetMedian(RandomIt begin, RandomIt middle, RandomIt last, Compare Comp) {
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 
 		if (middle == last) {
@@ -15,16 +16,16 @@ namespace Quicksort {
 			return last;
 		}
 
-		ValueType firstValue = *first;
+		ValueType beginValue = *begin;
 		ValueType middleValue = *middle;
 		ValueType lastValue = *last;
 
-		if (!Comp(lastValue, middleValue) && !Comp(middleValue, firstValue)) {
+		if (!Comp(lastValue, middleValue) && !Comp(middleValue, beginValue)) {
 			//middle is the median
 			return middle;
-		} else if (!Comp(lastValue, firstValue) && !Comp(firstValue, middleValue)) {
-			//first is the median
-			return first;
+		} else if (!Comp(lastValue, beginValue) && !Comp(beginValue, middleValue)) {
+			//begin is the median
+			return begin;
 		} else {
 			//last must be the median
 			return last;
@@ -32,47 +33,48 @@ namespace Quicksort {
 	}
 
 	template<class RandomIt, class Compare>
-	RandomIt Partition(RandomIt first, RandomIt end, Compare Comp) {
-		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+	RandomIt Partition(RandomIt begin, RandomIt end, Compare Comp) {
+		size_t length = std::distance(begin,end);
+		RandomIt middle = begin + length/2;
 
-		DiffType length = end-first;
-		RandomIt last = end - 1;
-		RandomIt middle = first + length/2;
+		RandomIt left = begin-1;
+		RandomIt right = end;
 
-		//For the pivot, use the median of the first, last, and middle element
-		ValueType pivot = *GetMedian(first, middle, last, Comp);
+		//For the pivot, use the median of the begin, right, and middle element
+		auto pivotValue = *GetMedian(begin, middle, end-1, Comp);
 		while (1) {
-			while (Comp(*first, pivot)) {
-				++first;
-			}
-			while (Comp(pivot, *last)) {
-				--last;
-			}
-			if (last-first <= 0) {
-				//The first and last iterators have crossed eachother
+			do {
+				++left;
+			} while (left != right && Comp(*left, pivotValue));
+
+			if (left == right) {
+				//The left and right iterators have crossed eachother
 				//	everything is now on the correct side of the pivot
-				return first;
+				return left;
 			}
-			std::iter_swap(first,last);
-			++first;
-			--last;
+
+			do {
+				--right;
+			} while (left != right && Comp(pivotValue, *right));
+
+			if (left == right) {
+				//The left and right iterators have crossed eachother
+				//	everything is now on the correct side of the pivot
+				return left;
+			}
+			std::iter_swap(left,right);
 		}
 	}
 
 	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
-	void Sort(RandomIt first, RandomIt end, Compare Comp = Compare()) {
-		using DiffType = typename std::iterator_traits<RandomIt>::difference_type;
-		
-		DiffType length = end-first;
-
-		if (length > 1) {
+	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
+		while (std::distance(begin,end) > 1) {
 			//At least 2 elements to sort
-			RandomIt partition = Partition(first, end, Comp);
-			Sort(first, partition, Comp);
+			RandomIt partition = Partition(begin, end, Comp);
 			Sort(partition, end, Comp);
+			end = partition;
 		}
 	}
 }
 
-#endif //_QUICKSORT_HPP
+#endif //QUICKSORT_HPP

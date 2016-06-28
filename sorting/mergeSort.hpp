@@ -1,56 +1,57 @@
+#ifndef MERGESORT_HPP
+#define MERGESORT_HPP 1
+
 #include <algorithm>
 #include <functional>
+#include <iterator>
 #include <vector>
-
-#ifndef _MERGESORT_HPP
-#define _MERGESORT_HPP 1
 
 namespace MergeSort {
 
 	enum class MergeType { InPlace, ExtraSpace };
 
 	template<class RandomIt, class Compare>
-	void InPlaceMerge(RandomIt first, RandomIt middle, RandomIt end, Compare Comp) {
+	void InPlaceMerge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
 		while (middle != end) {
-			while (first != middle && Comp(*first, *middle)) {
-				++first;
+			while (begin != middle && Comp(*begin, *middle)) {
+				++begin;
 			}
-			if (first == middle) {
+			if (begin == middle) {
 				//All good
 				return;
 			} else {
 				//Need to do a rotate
-				//      This moves 'middle' to the position of 'first',
-				//      and shifts [first, middle) to the right one
-				std::rotate(first, middle, middle+1);
-				++first;
+				//      This moves 'middle' to the position of 'begin',
+				//      and shifts [begin, middle) to the right one
+				std::rotate(begin, middle, middle+1);
+				++begin;
 				++middle;
 			}
 		}
 	}
 
 	template<class RandomIt, class Compare>
-	void ExtraSpaceMerge(RandomIt first, RandomIt middle, RandomIt end, Compare Comp) {
+	void ExtraSpaceMerge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 
 		//Save the left list in a temp because we'll be overwriting it as we insert
-		std::vector<ValueType> tempList(first,middle);
+		std::vector<ValueType> tempList(begin,middle);
 		auto leftIt = tempList.begin();
 		auto leftEnd = tempList.end();
 
 		RandomIt rightIt = middle;
 		RandomIt rightEnd = end;
 
-		RandomIt insertIt = first;
+		RandomIt insertIt = begin;
 
 		while (leftIt != leftEnd && rightIt != rightEnd) {
 			//While there are elements in both lists
 			if (Comp(*leftIt,*rightIt)) {
-				//Left list's first element goes first
+				//Left list's begin element goes begin
 				*insertIt = *leftIt;
 				++leftIt;
 			} else {
-				//Right list's first element goes first
+				//Right list's begin element goes begin
 				*insertIt = *rightIt;
 				++rightIt;
 			}
@@ -66,8 +67,8 @@ namespace MergeSort {
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
-	void Sort(RandomIt first, RandomIt end, MergeType mergeType = MergeType::ExtraSpace, Compare Comp = Compare()) {
+	template<class RandomIt, class Compare = std::less<>>
+	void Sort(RandomIt begin, RandomIt end, MergeType mergeType = MergeType::ExtraSpace, Compare Comp = Compare()) {
 		std::function<void(RandomIt,RandomIt,RandomIt,Compare)> MergeFunction;
 		
 		if (mergeType == MergeType::ExtraSpace) {
@@ -76,7 +77,7 @@ namespace MergeSort {
 			MergeFunction = InPlaceMerge<RandomIt,Compare>;
 		}
 
-		size_t length = end-first;
+		size_t length = std::distance(begin,end);
 
 		for (size_t width=1; width<length; width*=2) {
 			//We are going to merge lists of length 'width'
@@ -91,10 +92,10 @@ namespace MergeSort {
 				} else if (endPos >= length) {
 					endPos = length;
 				}
-				MergeFunction(first+firstPos, first+middlePos, first+endPos, Comp);
+				MergeFunction(begin+firstPos, begin+middlePos, begin+endPos, Comp);
 			}
 		}
 	}
-}
+} //namespace MergeSort
 
-#endif //_MERGESORT_HPP
+#endif //MERGESORT_HPP
