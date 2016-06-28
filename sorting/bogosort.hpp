@@ -1,10 +1,11 @@
+#ifndef BOGOSORT_HPP
+#define BOGOSORT_HPP 1
+
 #include <algorithm>
 #include <functional>
+#include <iterator>
 #include <random>
 #include <vector>
-
-#ifndef _BOGOSORT_HPP
-#define _BOGOSORT_HPP 1
 
 namespace Bogosort {
 
@@ -21,35 +22,34 @@ namespace Bogosort {
 	}
 
 	template<class RandomIt, class Compare>
-	void SortRandom(RandomIt first, RandomIt end, Compare comp) {
+	void SortRandom(RandomIt begin, RandomIt end, Compare comp) {
 		std::mt19937 eng = CreateRandomEngine();
-		while (!std::is_sorted(first,end, comp)) {
-			std::shuffle(first, end, eng);
+		while (!std::is_sorted(begin, end, comp)) {
+			std::shuffle(begin, end, eng);
 		}
 	}
 
 	template<class RandomIt, class Compare>
-	void SortPermute(RandomIt first, RandomIt end, Compare comp) {
+	void SortPermute(RandomIt begin, RandomIt end, Compare comp) {
 		//This method will iteratate through every permutation of the list possible
 		// (not necessarily in lexicographical order)
-		using DifferenceType = typename std::iterator_traits<RandomIt>::difference_type;
+		size_t length = std::distance(begin,end);
 
-		DifferenceType length = end - first;
-
-		std::vector<int> p(length);
+		std::vector<size_t> p(length);
 		{
-			int i = 0;
+			size_t i = 0;
 			std::generate(p.begin(), p.end(), [&i]{return i++;});
 		}
 
-		int i=1;
-		while (!std::is_sorted(first, end, comp) && i<length) {
+		size_t i=1;
+		while (!std::is_sorted(begin, end, comp) && i<length) {
+			//Advance to the next permutation
 			--p.at(i);
-			int j=0;
+			size_t j=0;
 			if (i%2 == 1) {
 				j = p.at(i);
 			}
-			std::iter_swap((first+i), (first+j));
+			std::iter_swap((begin+i), (begin+j));
 			i = 1;
 			while (i < length && p.at(i) == 0) {
 				p.at(i) = i;
@@ -58,14 +58,14 @@ namespace Bogosort {
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
-	void Sort(RandomIt first, RandomIt end, ShuffleType shuffleType = ShuffleType::Random, Compare comp = Compare()) {
+	template<class RandomIt, class Compare = std::less<>>
+	void Sort(RandomIt begin, RandomIt end, ShuffleType shuffleType = ShuffleType::Random, Compare comp = Compare()) {
 		if (shuffleType == ShuffleType::Random) {
-			SortRandom(first, end, comp);
+			SortRandom(begin, end, comp);
 		} else {
-			SortPermute(first, end, comp);
+			SortPermute(begin, end, comp);
 		}
 	}
-}
+} //namespace Bogosort
 
-#endif //_BOGOSORT_HPP
+#endif //BOGOSORT_HPP

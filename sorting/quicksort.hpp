@@ -37,11 +37,11 @@ namespace Quicksort {
 		size_t length = std::distance(begin,end);
 		RandomIt middle = begin + length/2;
 
-		RandomIt left = begin-1;
+		RandomIt left = std::prev(begin);
 		RandomIt right = end;
 
 		//For the pivot, use the median of the begin, right, and middle element
-		auto pivotValue = *GetMedian(begin, middle, end-1, Comp);
+		auto pivotValue = *GetMedian(begin, middle, std::prev(end), Comp);
 		while (1) {
 			do {
 				++left;
@@ -66,7 +66,7 @@ namespace Quicksort {
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
+	template<class RandomIt, class Compare = std::less<>>
 	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
 		while (std::distance(begin,end) > 1) {
 			//At least 2 elements to sort

@@ -1,10 +1,10 @@
+#ifndef TIMSORT_HPP
+#define TIMSORT_HPP 1
+
 #include <algorithm>
 #include <stack>
 #include "insertionSort.hpp"
 #include "mergeSort.hpp"
-
-#ifndef _TIMSORT_HPP
-#define _TIMSORT_HPP 1
 
 namespace Timsort {
 
@@ -34,32 +34,29 @@ namespace Timsort {
 
 	template<class RandomIt, class Compare>
 	size_t FindExistingRunLength(RandomIt begin, RandomIt end, Compare Comp) {
-		size_t length = end-begin;
+		size_t length = std::distance(begin,end);
 		if (length < 2) {
 			return length;
 		}
-		size_t runLength = 2; //guaranteed
 		RandomIt runIt = begin;
 		if (!Comp(*(runIt+1), *(runIt))) {
 			//Increasing run
-			runIt += runLength;
+			runIt += 2;
 			while (runIt != end && !Comp(*(runIt), *(runIt-1))) {
 				//Grow the run as long as the elements are increasing
 				++runIt;
-				++runLength;
 			}
 		} else {
 			//Strictly decreasing run
-			runIt += runLength;
+			runIt += 2;
 			while (runIt != end && Comp(*(runIt), *(runIt-1))) {
 				//Grow the run as long as the elements are strictly decreasing
 				++runIt;
-				++runLength;
 			}
 			//Since they were strictly decreasing, we can easily reverse them to get an increasing run
 			std::reverse(begin, runIt);
 		}
-		return runLength;
+		return std::distance(begin,runIt);
 	}
 
 	template<class RandomIt, class Compare>
@@ -106,9 +103,9 @@ namespace Timsort {
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<typename std::iterator_traits<RandomIt>::value_type>>
+	template<class RandomIt, class Compare = std::less<>>
 	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
-		size_t length = end-begin;
+		size_t length = std::distance(begin,end);
 		const size_t minRunLength = CalculateMinrun(length);
 
 		std::stack<Run<RandomIt>> runStack;
@@ -140,6 +137,6 @@ namespace Timsort {
 
 		MergeRemainingOnStack(&runStack, Comp);
 	}
-}
+} //namespace Timsort
 
-#endif //_TIMSORT_HPP
+#endif //TIMSORT_HPP
