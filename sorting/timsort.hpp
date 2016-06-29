@@ -74,14 +74,14 @@ namespace Timsort {
 				if (a.length < c.length) {
 					//Merge a and b
 					size_t totalLength = a.length+b.length;
-					MergeSort::ExtraSpaceMerge(b.begin, b.begin+b.length, b.begin+totalLength, Comp);
+					MergeSort::Merge(b.begin, b.begin+b.length, b.begin+totalLength, Comp);
 					runStack->push(c);
 					runStack->emplace(b.begin, totalLength);
 				} else {
 					//Merge b and c
 					//	ties favor c
 					size_t totalLength = b.length+c.length;
-					MergeSort::ExtraSpaceMerge(c.begin, c.begin+c.length, c.begin+totalLength, Comp);
+					MergeSort::Merge(c.begin, c.begin+c.length, c.begin+totalLength, Comp);
 					runStack->emplace(c.begin, totalLength);
 					runStack->push(a);
 				}
@@ -98,7 +98,7 @@ namespace Timsort {
 			runStack->pop();
 
 			size_t totalLength = a.length+b.length;
-			MergeSort::ExtraSpaceMerge(b.begin, b.begin+b.length, b.begin+totalLength, Comp);
+			MergeSort::Merge(b.begin, b.begin+b.length, b.begin+totalLength, Comp);
 			runStack->emplace(b.begin, totalLength);
 		}
 	}

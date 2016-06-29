@@ -31,7 +31,7 @@ namespace MergeSort {
 	}
 
 	template<class RandomIt, class Compare>
-	void ExtraSpaceMerge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 
 		//Save the left list in a temp because we'll be overwriting it as we insert
@@ -72,7 +72,7 @@ namespace MergeSort {
 		std::function<void(RandomIt,RandomIt,RandomIt,Compare)> MergeFunction;
 		
 		if (mergeType == MergeType::ExtraSpace) {
-			MergeFunction = ExtraSpaceMerge<RandomIt,Compare>;
+			MergeFunction = Merge<RandomIt,Compare>;
 		} else {
 			MergeFunction = InPlaceMerge<RandomIt,Compare>;
 		}
