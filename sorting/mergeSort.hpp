@@ -32,6 +32,15 @@ namespace MergeSort {
 
 	template<class RandomIt, class Compare>
 	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+		size_t leftLength = std::distance(begin, middle);
+		size_t rightLength = std::distance(middle, end);
+
+		if (leftLength > rightLength) {
+			using ReverseIterator = std::reverse_iterator<RandomIt>;
+			Merge(ReverseIterator(end), ReverseIterator(std::next(middle)), ReverseIterator(begin), Comp);
+			return;
+		}
+
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 
 		//Save the left list in a temp because we'll be overwriting it as we insert
