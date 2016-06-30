@@ -21,12 +21,39 @@ namespace MergeSort {
 				return;
 			} else {
 				//Need to do a rotate
-				//      This moves 'middle' to the position of 'begin',
-				//      and shifts [begin, middle) to the right one
+				//	This moves 'middle' to the position of 'begin',
+				//	and shifts [begin, middle) to the right one
 				std::rotate(begin, middle, middle+1);
 				++begin;
 				++middle;
 			}
+		}
+	}
+
+	template<class LeftRandomIt, class RightRandomIt, class InsertRandomIt, class Compare>
+	void Merge(LeftRandomIt leftBegin, LeftRandomIt leftEnd, RightRandomIt rightBegin, RightRandomIt rightEnd, InsertRandomIt insertionPoint, Compare Comp) {
+		while (leftBegin != leftEnd && rightBegin != rightEnd) {
+			auto leftValue = *leftBegin;
+			auto rightValue = *rightBegin;
+			//While there are elements in both lists
+			if (Comp(leftValue, rightValue)) {
+				//Left list's begin element goes begin
+				*insertionPoint = leftValue;
+				++leftBegin;
+			} else {
+				//Right list's begin element goes begin
+				*insertionPoint = rightValue;
+				++rightBegin;
+			}
+			++insertionPoint;
+		}
+		//Now at least one list is empty
+		if (leftBegin != leftEnd) {
+			//Insert all of the left list into the list (right is empty)
+			std::move(leftBegin, leftEnd, insertionPoint);
+		} else if (rightBegin != rightEnd) {
+			//Insert all of the right list into the list (left is empty)
+			std::move(rightBegin, rightEnd, insertionPoint);
 		}
 	}
 
@@ -44,27 +71,7 @@ namespace MergeSort {
 
 		RandomIt insertIt = begin;
 
-		while (leftIt != leftEnd && rightIt != rightEnd) {
-			//While there are elements in both lists
-			if (Comp(*leftIt,*rightIt)) {
-				//Left list's begin element goes begin
-				*insertIt = *leftIt;
-				++leftIt;
-			} else {
-				//Right list's begin element goes begin
-				*insertIt = *rightIt;
-				++rightIt;
-			}
-			++insertIt;
-		}
-		//Now at least one list is empty
-		if (leftIt != leftEnd) {
-			//Insert all of the left list into the list (right is empty)
-			std::move(leftIt, leftEnd, insertIt);
-		} else if (rightIt != rightEnd) {
-			//Insert all of the right list into the list (left is empty)
-			std::move(rightIt, rightEnd, insertIt);
-		}
+		Merge(leftIt, leftEnd, rightIt, rightEnd, insertIt, Comp);
 	}
 
 	template<class RandomIt, class Compare>
@@ -77,34 +84,16 @@ namespace MergeSort {
 		auto rightIt = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.end());
 		auto rightEnd = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.begin());
 
-		auto leftIt = RevIt(middle);
-		auto leftEnd = RevIt(begin);
+		RevIt leftIt = RevIt(middle);
+		RevIt leftEnd = RevIt(begin);
 
-		auto insertIt = RevIt(end);
+		RevIt insertIt = RevIt(end);
 
-		while (leftIt != leftEnd && rightIt != rightEnd) {
-			auto leftValue = *leftIt;
-			auto rightValue = *rightIt;
-			//While there are elements in both lists
-			if (Comp(rightValue, leftValue)) {
-				//Left list's begin element goes begin
-				*insertIt = leftValue;
-				++leftIt;
-			} else {
-				//Right list's begin element goes begin
-				*insertIt = rightValue;
-				++rightIt;
-			}
-			++insertIt;
-		}
-		//Now at least one list is empty
-		if (leftIt != leftEnd) {
-			//Insert all of the left list into the list (right is empty)
-			std::move(leftIt, leftEnd, insertIt);
-		} else if (rightIt != rightEnd) {
-			//Insert all of the right list into the list (left is empty)
-			std::move(rightIt, rightEnd, insertIt);
-		}
+		auto NewComp = [&Comp](const auto &a, const auto &b) -> bool {
+			return Comp(b, a);
+		};
+
+		Merge(leftIt, leftEnd, rightIt, rightEnd, insertIt, NewComp);
 	}
 
 	template<class RandomIt, class Compare>
@@ -112,6 +101,8 @@ namespace MergeSort {
 		size_t leftLength = std::distance(begin, middle);
 		size_t rightLength = std::distance(middle, end);
 
+		//MergeLeft or MergeRight depending on whether the
+		//	left or right is smaller
 		if (leftLength <= rightLength) {
 			MergeLeft(begin, middle, end, Comp);
 		} else {
