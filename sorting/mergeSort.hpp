@@ -31,16 +31,7 @@ namespace MergeSort {
 	}
 
 	template<class RandomIt, class Compare>
-	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
-		size_t leftLength = std::distance(begin, middle);
-		size_t rightLength = std::distance(middle, end);
-
-		if (leftLength > rightLength) {
-			using ReverseIterator = std::reverse_iterator<RandomIt>;
-			Merge(ReverseIterator(end), ReverseIterator(std::next(middle)), ReverseIterator(begin), Comp);
-			return;
-		}
-
+	void MergeLeft(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 
 		//Save the left list in a temp because we'll be overwriting it as we insert
@@ -73,6 +64,58 @@ namespace MergeSort {
 		} else if (rightIt != rightEnd) {
 			//Insert all of the right list into the list (left is empty)
 			std::move(rightIt, rightEnd, insertIt);
+		}
+	}
+
+	template<class RandomIt, class Compare>
+	void MergeRight(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		using RevIt = std::reverse_iterator<RandomIt>;
+
+		//Save the left list in a temp because we'll be overwriting it as we insert
+		std::vector<ValueType> tempList(middle, end);
+		auto rightIt = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.end());
+		auto rightEnd = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.begin());
+
+		auto leftIt = RevIt(middle);
+		auto leftEnd = RevIt(begin);
+
+		auto insertIt = RevIt(end);
+
+		while (leftIt != leftEnd && rightIt != rightEnd) {
+			auto leftValue = *leftIt;
+			auto rightValue = *rightIt;
+			//While there are elements in both lists
+			if (Comp(rightValue, leftValue)) {
+				//Left list's begin element goes begin
+				*insertIt = leftValue;
+				++leftIt;
+			} else {
+				//Right list's begin element goes begin
+				*insertIt = rightValue;
+				++rightIt;
+			}
+			++insertIt;
+		}
+		//Now at least one list is empty
+		if (leftIt != leftEnd) {
+			//Insert all of the left list into the list (right is empty)
+			std::move(leftIt, leftEnd, insertIt);
+		} else if (rightIt != rightEnd) {
+			//Insert all of the right list into the list (left is empty)
+			std::move(rightIt, rightEnd, insertIt);
+		}
+	}
+
+	template<class RandomIt, class Compare>
+	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+		size_t leftLength = std::distance(begin, middle);
+		size_t rightLength = std::distance(middle, end);
+
+		if (leftLength <= rightLength) {
+			MergeLeft(begin, middle, end, Comp);
+		} else {
+			MergeRight(begin, middle, end, Comp);
 		}
 	}
 
