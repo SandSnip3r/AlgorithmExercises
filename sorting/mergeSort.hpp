@@ -32,38 +32,52 @@ namespace MergeSort {
 		}
 	}
 
-	template<class LeftRandomIt, class RightRandomIt, class InsertRandomIt, class Compare>
-	void Merge(LeftRandomIt leftBegin, LeftRandomIt leftEnd, RightRandomIt rightBegin, RightRandomIt rightEnd, InsertRandomIt insertionPoint, Compare Comp) {
-		while (leftBegin != leftEnd && rightBegin != rightEnd) {
-			auto leftValue = *leftBegin;
-			auto rightValue = *rightBegin;
-			//While there are elements in both lists
-			if (Comp(leftValue, rightValue)) {
-				//Left list's begin element goes begin
-				*insertionPoint = leftValue;
-				++leftBegin;
-			} else {
-				//Right list's begin element goes begin
-				*insertionPoint = rightValue;
-				++rightBegin;
-			}
-			++insertionPoint;
+	template <class RandomIt>
+	RandomIt ReverseIt(std::reverse_iterator<RandomIt> it) {
+		return it.base();
+	}
+
+	template <class RandomIt>
+	std::reverse_iterator<RandomIt> ReverseIt(RandomIt it) {
+		return std::reverse_iterator<RandomIt>(it);
+	}
+
+	template<class Compare>
+	struct ReversedCompare {
+		Compare compare;
+		template<class Left, class Right>
+		bool operator()(const Left& left, const Right& right) {
+			return compare(right,left);
 		}
-		//Now at least one list is empty
-		if (leftBegin != leftEnd) {
-			//Insert all of the left list into the list (right is empty)
-			std::move(leftBegin, leftEnd, insertionPoint);
-		} else if (rightBegin != rightEnd) {
-			//Insert all of the right list into the list (left is empty)
-			std::move(rightBegin, rightEnd, insertionPoint);
-		}
+	};
+
+	template <class Compare>
+	Compare ReverseComp(ReversedCompare<Compare> compare) {
+		return compare.compare;
+	}
+
+	template <class Compare>
+	ReversedCompare<Compare> ReverseComp(Compare compare) {
+		return ReversedCompare<Compare>{compare};
 	}
 
 	template<class RandomIt, class Compare>
-	void MergeLeft(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
-		//Merging the right into the place of the left (left is smaller)
-		
+	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+		size_t leftLength = std::distance(begin, middle);
+		size_t rightLength = std::distance(middle, end);
+
+		if (leftLength > rightLength) {
+			//Left list is bigger, swap everything around and recursively call this function
+			Merge(ReverseIt(end), ReverseIt(middle), ReverseIt(begin), ReverseComp(Comp));
+			return;
+		}
+		//Now guaranteed that [begin,middle) <= [middle,end)
+
 		//Determine if there are any leftmost positions that are already in place
+		//	"These preliminary searches may not pay off, and can be expected *not* to
+		//	repay their cost if the data is random.  But they can win huge in all of
+		//	time, copying, and memory savings when they do pay"
+		//	According to https://svn.python.org/projects/python/trunk/Objects/listsort.txt
 		RandomIt newLeftBegin = std::upper_bound(begin, middle, *middle, Comp);
 		if (newLeftBegin == middle) {
 			//Everything in the left list is smaller than the first in the right list, we're done
@@ -82,44 +96,28 @@ namespace MergeSort {
 
 		RandomIt insertIt = newLeftBegin;
 
-		Merge(leftIt, leftEnd, rightIt, rightEnd, insertIt, Comp);
-	}
-
-	template<class RandomIt, class Compare>
-	void MergeRight(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
-		//Merging the left into the place of the right (right is smaller)
-		
-		using RevIt = std::reverse_iterator<RandomIt>;
-
-		//Save the left list in a temp because we'll be overwriting it as we insert
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
-		std::vector<ValueType> tempList(middle, end);
-		auto rightIt = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.end());
-		auto rightEnd = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.begin());
-
-		RevIt leftIt = RevIt(middle);
-		RevIt leftEnd = RevIt(begin);
-
-		RevIt insertIt = RevIt(end);
-
-		auto NewComp = [&Comp](const auto &a, const auto &b) -> bool {
-			return Comp(b, a);
-		};
-
-		Merge(leftIt, leftEnd, rightIt, rightEnd, insertIt, NewComp);
-	}
-
-	template<class RandomIt, class Compare>
-	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
-		size_t leftLength = std::distance(begin, middle);
-		size_t rightLength = std::distance(middle, end);
-
-		//MergeLeft or MergeRight depending on whether the
-		//	left or right is smaller
-		if (leftLength <= rightLength) {
-			MergeLeft(begin, middle, end, Comp);
-		} else {
-			MergeRight(begin, middle, end, Comp);
+		while (leftIt != leftEnd && rightIt != rightEnd) {
+			auto leftValue = *leftIt;
+			auto rightValue = *rightIt;
+			//While there are elements in both lists
+			if (Comp(leftValue, rightValue)) {
+				//Left list's begin element goes begin
+				*insertIt = leftValue;
+				++leftIt;
+			} else {
+				//Right list's begin element goes begin
+				*insertIt = rightValue;
+				++rightIt;
+			}
+			++insertIt;
+		}
+		//Now at least one list is empty
+		if (leftIt != leftEnd) {
+			//Insert all of the left list into the list (right is empty)
+			std::move(leftIt, leftEnd, insertIt);
+		} else if (rightIt != rightEnd) {
+			//Insert all of the right list into the list (left is empty)
+			std::move(rightIt, rightEnd, insertIt);
 		}
 	}
 
