@@ -6,6 +6,8 @@
 #include <iterator>
 #include <vector>
 
+#include <iostream>
+
 namespace MergeSort {
 
 	enum class MergeType { InPlace, ExtraSpace };
@@ -59,27 +61,38 @@ namespace MergeSort {
 
 	template<class RandomIt, class Compare>
 	void MergeLeft(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		//Merging the right into the place of the left (left is smaller)
+		
+		//Determine if there are any leftmost positions that are already in place
+		RandomIt newLeftBegin = std::upper_bound(begin, middle, *middle, Comp);
+		if (newLeftBegin == middle) {
+			//Everything in the left list is smaller than the first in the right list, we're done
+			return;
+		}
 
+		// newLeftBegin saved std::distance(begin, newLeftBegin)*sizeof(RandomIt) bytes of extra space usage
 		//Save the left list in a temp because we'll be overwriting it as we insert
-		std::vector<ValueType> tempList(begin,middle);
+		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		std::vector<ValueType> tempList(newLeftBegin, middle);
 		auto leftIt = tempList.begin();
 		auto leftEnd = tempList.end();
 
 		RandomIt rightIt = middle;
 		RandomIt rightEnd = end;
 
-		RandomIt insertIt = begin;
+		RandomIt insertIt = newLeftBegin;
 
 		Merge(leftIt, leftEnd, rightIt, rightEnd, insertIt, Comp);
 	}
 
 	template<class RandomIt, class Compare>
 	void MergeRight(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		//Merging the left into the place of the right (right is smaller)
+		
 		using RevIt = std::reverse_iterator<RandomIt>;
 
 		//Save the left list in a temp because we'll be overwriting it as we insert
+		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 		std::vector<ValueType> tempList(middle, end);
 		auto rightIt = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.end());
 		auto rightEnd = std::reverse_iterator<typename std::vector<ValueType>::iterator>(tempList.begin());
