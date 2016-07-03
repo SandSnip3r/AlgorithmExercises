@@ -10,7 +10,7 @@
 
 namespace Introsort {
 
-  const size_t SORT_THRESHOLD = 16;
+	const size_t SORT_THRESHOLD = 16;
 
 	template<class RandomIt, class Compare>
 	void SortLimitedDepth(RandomIt begin, RandomIt end, int depthLimit, Compare Comp) {

@@ -2,6 +2,7 @@
 #define MERGESORT_HPP 1
 
 #include <algorithm>
+#include <array>
 #include <functional>
 #include <iterator>
 #include <vector>
@@ -11,6 +12,7 @@
 namespace MergeSort {
 
 	enum class MergeType { InPlace, ExtraSpace };
+	const int MIN_GALLOP = 7;
 
 	template<class RandomIt, class Compare>
 	void InPlaceMerge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
@@ -61,6 +63,123 @@ namespace MergeSort {
 		return ReversedCompare<Compare>{compare};
 	}
 
+	template<class SourceRandomIt, class TargetRandomIt, class Compare>
+	TargetRandomIt Gallop(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
+		// std::cout << "Gallop" << std::endl;
+		auto length = std::distance(targetBegin, targetEnd);
+		auto sourceValue = *sourceIt;
+		if (!Comp(*targetBegin, sourceValue)) {
+			// std::cout << "Before" << std::endl;
+			return targetBegin;
+		} else if (Comp(*(std::prev(targetEnd)), sourceValue)) {
+			// std::cout << "After" << std::endl;
+			return targetEnd;
+		}
+		for (int i=1;;++i) {
+			auto leftBoundPos = (1<<(i-1))-1;
+			auto rightBoundPos = (1<<i)-1;
+			if (rightBoundPos >= length) {
+				rightBoundPos = length-1;
+			}
+			auto leftBound = targetBegin + leftBoundPos;
+			auto rightBound = targetBegin + rightBoundPos;
+			if (Comp(*leftBound, sourceValue) && !Comp(*rightBound, sourceValue)) {
+				// std::cout << "Between " << leftBoundPos << " and " << rightBoundPos << std::endl;
+				auto resultingPos = std::lower_bound(leftBound, std::next(rightBound), sourceValue, Comp);
+				return resultingPos;
+			}
+		}
+	}
+
+	template<class LeftRandomIt, class RightRandomIt, class InsertRandomIt, class Compare>
+	void MergeInto(LeftRandomIt leftIt, LeftRandomIt leftEnd, RightRandomIt rightIt, RightRandomIt rightEnd, InsertRandomIt insertIt, Compare Comp) {
+		//Begin merging
+		while (1) {
+			int leftRunCount = 0;
+			int rightRunCount = 0;
+			bool hitBounds = false;
+			while (leftRunCount < MIN_GALLOP && rightRunCount < MIN_GALLOP) {
+				//While there are elements in both lists
+				auto leftValue = *leftIt;
+				auto rightValue = *rightIt;
+
+				//======================STANDARD======================
+				if (Comp(leftValue, rightValue)) {
+					//Left list's begin element goes begin
+					*insertIt = leftValue;
+					++leftIt;
+					++leftRunCount;
+					rightRunCount = 0;
+				} else {
+					//Right list's begin element goes begin
+					*insertIt = rightValue;
+					++rightIt;
+					++rightRunCount;
+					leftRunCount = 0;
+				}
+				++insertIt;
+				if (leftIt == leftEnd || rightIt == rightEnd) {
+					//At least one list is empty
+					hitBounds = true;
+					break;
+				}
+				//====================================================
+			}
+			//Either going to enter galloping mode or hit our bounds
+			if (hitBounds) {
+				//At least one list is empty
+				break;
+			}
+			//Done with standard mode, now gallop
+			do {
+				//=======================GALLOP=======================
+				auto rightInsertIt = Gallop(leftIt, rightIt, rightEnd, Comp);
+				auto rightRunCount = std::distance(rightIt, rightInsertIt);
+				std::copy(rightIt, rightInsertIt, insertIt);
+				std::advance(insertIt, rightRunCount);
+				std::advance(rightIt, rightRunCount);
+				*insertIt = *leftIt;
+				++leftIt;
+				++insertIt;
+
+				if (leftIt == leftEnd || rightIt == rightEnd) {
+					//At least one list is empty
+					hitBounds = true;
+					break;
+				}
+
+				auto leftInsertIt = Gallop(rightIt, leftIt, leftEnd, Comp);
+				auto leftRunCount = std::distance(leftIt, leftInsertIt);
+				std::copy(leftIt, leftInsertIt, insertIt);
+				std::advance(insertIt, leftRunCount);
+				std::advance(leftIt, leftRunCount);
+				*insertIt = *rightIt;
+				++rightIt;
+				++insertIt;
+
+				if (leftIt == leftEnd || rightIt == rightEnd) {
+					//At least one list is empty
+					hitBounds = true;
+					break;
+				}
+				//Repeat if at least one run was long enough
+			}	while (leftRunCount < MIN_GALLOP && rightRunCount < MIN_GALLOP);
+			//Either going back to standard mode or hit our bounds
+			if (hitBounds) {
+				//At least one list is empty
+				break;
+			}
+		}
+		//Now at least one list is empty
+		if (leftIt != leftEnd) {
+			//Insert all of the left list into the list (right is empty)
+			std::move(leftIt, leftEnd, insertIt);
+		} else if (rightIt != rightEnd) {
+			//Insert all of the right list into the list (left is empty)
+			std::move(rightIt, rightEnd, insertIt);
+		}
+	}
+
 	template<class RandomIt, class Compare>
 	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
 		size_t leftLength = std::distance(begin, middle);
@@ -68,7 +187,13 @@ namespace MergeSort {
 
 		if (leftLength > rightLength) {
 			//Left list is bigger, swap everything around and recursively call this function
+			// std::cout << "Pre-reverse merge: ";
+			// std::copy(begin, end, std::ostream_iterator<typename std::iterator_traits<RandomIt>::value_type>(std::cout, " "));
+			// std::cout << std::endl;
 			Merge(ReverseIt(end), ReverseIt(middle), ReverseIt(begin), ReverseComp(Comp));
+			// std::cout << "Post-reverse merge: ";
+			// std::copy(begin, end, std::ostream_iterator<typename std::iterator_traits<RandomIt>::value_type>(std::cout, " "));
+			// std::cout << std::endl;
 			return;
 		}
 		//Now guaranteed that [begin,middle) <= [middle,end)
@@ -78,7 +203,7 @@ namespace MergeSort {
 		//	repay their cost if the data is random.  But they can win huge in all of
 		//	time, copying, and memory savings when they do pay"
 		//	According to https://svn.python.org/projects/python/trunk/Objects/listsort.txt
-		RandomIt newLeftBegin = std::upper_bound(begin, middle, *middle, Comp);
+		auto newLeftBegin = std::upper_bound(begin, middle, *middle, Comp);
 		if (newLeftBegin == middle) {
 			//Everything in the left list is smaller than the first in the right list, we're done
 			return;
@@ -91,34 +216,12 @@ namespace MergeSort {
 		auto leftIt = tempList.begin();
 		auto leftEnd = tempList.end();
 
-		RandomIt rightIt = middle;
-		RandomIt rightEnd = end;
+		auto rightIt = middle;
+		auto rightEnd = end;
 
-		RandomIt insertIt = newLeftBegin;
+		auto insertIt = newLeftBegin;
 
-		while (leftIt != leftEnd && rightIt != rightEnd) {
-			auto leftValue = *leftIt;
-			auto rightValue = *rightIt;
-			//While there are elements in both lists
-			if (Comp(leftValue, rightValue)) {
-				//Left list's begin element goes begin
-				*insertIt = leftValue;
-				++leftIt;
-			} else {
-				//Right list's begin element goes begin
-				*insertIt = rightValue;
-				++rightIt;
-			}
-			++insertIt;
-		}
-		//Now at least one list is empty
-		if (leftIt != leftEnd) {
-			//Insert all of the left list into the list (right is empty)
-			std::move(leftIt, leftEnd, insertIt);
-		} else if (rightIt != rightEnd) {
-			//Insert all of the right list into the list (left is empty)
-			std::move(rightIt, rightEnd, insertIt);
-		}
+		MergeInto(leftIt, leftEnd, rightIt, rightEnd, insertIt, Comp);
 	}
 
 	template<class RandomIt, class Compare = std::less<>>
