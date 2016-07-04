@@ -4,7 +4,7 @@
   - Heapify-down implemented as non-recursive
 - Quicksort
   - Uses the Hoare partition scheme
-  - Uses median-of-three pivot selection (considering implementing the ninther for larger lists)
+  - Uses median-of-three pivot selection
 - Insertion sort
 - Introsort
   - Using C++ STL implementation
@@ -17,7 +17,10 @@
 - Bubble sort
 - Merge sort
   - Implemented using a bottom-up approach (non-recursive)
+  - Main merge method uses no more than n/2 extra space
+    - Galloping also implemented (concept from Timsort)
   - In-place merge method also implemented just in case memory is a concern
     - Speed degrades to O(n^2)
 - Selection sort
 - Timsort
+  - Uses MergeSort's merge
