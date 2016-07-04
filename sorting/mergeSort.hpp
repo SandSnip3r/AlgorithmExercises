@@ -64,15 +64,12 @@ namespace MergeSort {
 	}
 
 	template<class SourceRandomIt, class TargetRandomIt, class Compare>
-	TargetRandomIt Gallop(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
-		// std::cout << "Gallop" << std::endl;
+	TargetRandomIt GallopRight(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
 		auto length = std::distance(targetBegin, targetEnd);
 		auto sourceValue = *sourceIt;
 		if (!Comp(*targetBegin, sourceValue)) {
-			// std::cout << "Before" << std::endl;
 			return targetBegin;
 		} else if (Comp(*(std::prev(targetEnd)), sourceValue)) {
-			// std::cout << "After" << std::endl;
 			return targetEnd;
 		}
 		for (int i=1;;++i) {
@@ -84,8 +81,34 @@ namespace MergeSort {
 			auto leftBound = targetBegin + leftBoundPos;
 			auto rightBound = targetBegin + rightBoundPos;
 			if (Comp(*leftBound, sourceValue) && !Comp(*rightBound, sourceValue)) {
-				// std::cout << "Between " << leftBoundPos << " and " << rightBoundPos << std::endl;
 				auto resultingPos = std::lower_bound(leftBound, std::next(rightBound), sourceValue, Comp);
+				return resultingPos;
+			}
+		}
+	}
+
+	template<class SourceRandomIt, class TargetRandomIt, class Compare>
+	TargetRandomIt GallopLeft(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
+		auto AlteredComp = [&Comp](const auto &left, const auto &right) -> bool {
+			return !Comp(right,left);
+		};
+		auto length = std::distance(targetBegin, targetEnd);
+		auto sourceValue = *sourceIt;
+		if (!AlteredComp(*targetBegin, sourceValue)) {
+			return targetBegin;
+		} else if (AlteredComp(*(std::prev(targetEnd)), sourceValue)) {
+			return targetEnd;
+		}
+		for (int i=1;;++i) {
+			auto leftBoundPos = (1<<(i-1))-1;
+			auto rightBoundPos = (1<<i)-1;
+			if (rightBoundPos >= length) {
+				rightBoundPos = length-1;
+			}
+			auto leftBound = targetBegin + leftBoundPos;
+			auto rightBound = targetBegin + rightBoundPos;
+			if (AlteredComp(*leftBound, sourceValue) && !AlteredComp(*rightBound, sourceValue)) {
+				auto resultingPos = std::lower_bound(leftBound, std::next(rightBound), sourceValue, AlteredComp);
 				return resultingPos;
 			}
 		}
@@ -104,14 +127,14 @@ namespace MergeSort {
 				auto rightValue = *rightIt;
 
 				//======================STANDARD======================
-				if (Comp(leftValue, rightValue)) {
-					//Left list's begin element goes begin
+				if (!Comp(rightValue, leftValue)) {
+					//Left list's first element is inserted
 					*insertIt = leftValue;
 					++leftIt;
 					++leftRunCount;
 					rightRunCount = 0;
 				} else {
-					//Right list's begin element goes begin
+					//Right list's first element is inserted
 					*insertIt = rightValue;
 					++rightIt;
 					++rightRunCount;
@@ -133,7 +156,7 @@ namespace MergeSort {
 			//Done with standard mode, now gallop
 			do {
 				//=======================GALLOP=======================
-				auto rightInsertIt = Gallop(leftIt, rightIt, rightEnd, Comp);
+				auto rightInsertIt = GallopRight(leftIt, rightIt, rightEnd, Comp);
 				auto rightRunCount = std::distance(rightIt, rightInsertIt);
 				std::copy(rightIt, rightInsertIt, insertIt);
 				std::advance(insertIt, rightRunCount);
@@ -148,7 +171,7 @@ namespace MergeSort {
 					break;
 				}
 
-				auto leftInsertIt = Gallop(rightIt, leftIt, leftEnd, Comp);
+				auto leftInsertIt = GallopLeft(rightIt, leftIt, leftEnd, Comp);
 				auto leftRunCount = std::distance(leftIt, leftInsertIt);
 				std::copy(leftIt, leftInsertIt, insertIt);
 				std::advance(insertIt, leftRunCount);
@@ -187,27 +210,27 @@ namespace MergeSort {
 
 		if (leftLength > rightLength) {
 			//Left list is bigger, swap everything around and recursively call this function
-			// std::cout << "Pre-reverse merge: ";
-			// std::copy(begin, end, std::ostream_iterator<typename std::iterator_traits<RandomIt>::value_type>(std::cout, " "));
-			// std::cout << std::endl;
 			Merge(ReverseIt(end), ReverseIt(middle), ReverseIt(begin), ReverseComp(Comp));
-			// std::cout << "Post-reverse merge: ";
-			// std::copy(begin, end, std::ostream_iterator<typename std::iterator_traits<RandomIt>::value_type>(std::cout, " "));
-			// std::cout << std::endl;
 			return;
 		}
 		//Now guaranteed that [begin,middle) <= [middle,end)
 
 		//Determine if there are any leftmost positions that are already in place
-		//	"These preliminary searches may not pay off, and can be expected *not* to
-		//	repay their cost if the data is random.  But they can win huge in all of
-		//	time, copying, and memory savings when they do pay"
-		//	According to https://svn.python.org/projects/python/trunk/Objects/listsort.txt
 		auto newLeftBegin = std::upper_bound(begin, middle, *middle, Comp);
 		if (newLeftBegin == middle) {
 			//Everything in the left list is smaller than the first in the right list, we're done
 			return;
 		}
+		//Determine if there are any righmost positions that are already in place
+		auto rightEnd = std::upper_bound(middle, end, *(std::prev(middle)), Comp);
+		if (rightEnd == middle) {
+			//Everything in the left list is smaller than the first in the right list, we're done
+			return;
+		}
+		//	"These preliminary searches[newLeftBegin&rightEnd] may not pay off, and can be expected *not* to
+		//	repay their cost if the data is random.  But they can win huge in all of
+		//	time, copying, and memory savings when they do pay"
+		//	According to https://svn.python.org/projects/python/trunk/Objects/listsort.txt
 
 		// newLeftBegin saved std::distance(begin, newLeftBegin)*sizeof(RandomIt) bytes of extra space usage
 		//Save the left list in a temp because we'll be overwriting it as we insert
@@ -217,7 +240,6 @@ namespace MergeSort {
 		auto leftEnd = tempList.end();
 
 		auto rightIt = middle;
-		auto rightEnd = end;
 
 		auto insertIt = newLeftBegin;
 
