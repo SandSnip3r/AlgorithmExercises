@@ -14,8 +14,8 @@ namespace Introsort {
 
 	template<class RandomIt, class Compare>
 	void SortLimitedDepth(RandomIt begin, RandomIt end, int depthLimit, Compare Comp) {
-		//This method uses a while loop to continually sort the left
-		//	half of the list and recursively sort the right,
+		//This method uses a while loop to continually sort the
+		//	left half of the list and recursively sort the right,
 		//	rather than recursively sorting both
 		while (static_cast<size_t>(std::distance(begin,end)) > SORT_THRESHOLD) {
 			//While the length of our list is greater than the specified threshold

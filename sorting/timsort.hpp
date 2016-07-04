@@ -38,7 +38,7 @@ namespace Timsort {
 		if (length < 2) {
 			return length;
 		}
-		RandomIt runIt = begin;
+		auto runIt = begin;
 		if (!Comp(*(runIt+1), *(runIt))) {
 			//Increasing run
 			runIt += 2;
@@ -53,7 +53,8 @@ namespace Timsort {
 				//Grow the run as long as the elements are strictly decreasing
 				++runIt;
 			}
-			//Since they were strictly decreasing, we can easily reverse them to get an increasing run
+			//Since they were strictly decreasing, we can easily
+			//	reverse them to get a stable increasing run
 			std::reverse(begin, runIt);
 		}
 		return std::distance(begin,runIt);
@@ -62,6 +63,7 @@ namespace Timsort {
 	template<class RandomIt, class Compare>
 	void MaintainStackInvariants(std::stack<Run<RandomIt>> *runStack, Compare Comp) {
 		while (runStack->size() >= 3) {
+			//Pop the top three off the stack
 			Run<RandomIt> a = runStack->top();
 			runStack->pop();
 			Run<RandomIt> b = runStack->top();
@@ -92,11 +94,13 @@ namespace Timsort {
 	template<class RandomIt, class Compare>
 	void MergeRemainingOnStack(std::stack<Run<RandomIt>> *runStack, Compare Comp) {
 		while (runStack->size() >= 2) {
+			//Pop top 2 off stack
 			Run<RandomIt> a = runStack->top();
 			runStack->pop();
 			Run<RandomIt> b = runStack->top();
 			runStack->pop();
 
+			//Merge them then push the result
 			size_t totalLength = a.length+b.length;
 			MergeSort::Merge(b.begin, b.begin+b.length, b.begin+totalLength, Comp);
 			runStack->emplace(b.begin, totalLength);

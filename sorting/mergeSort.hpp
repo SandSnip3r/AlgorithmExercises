@@ -63,6 +63,9 @@ namespace MergeSort {
 
 	template<class SourceRandomIt, class TargetRandomIt, class Compare>
 	TargetRandomIt GallopRight(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
+		//Gallop through the list checking if sourceIt
+		//	fits between 2^(i-1) and 2^i
+		//	then do a binary search within that range
 		auto length = std::distance(targetBegin, targetEnd);
 		auto sourceValue = *sourceIt;
 		if (!Comp(*targetBegin, sourceValue)) {
@@ -87,6 +90,9 @@ namespace MergeSort {
 
 	template<class SourceRandomIt, class TargetRandomIt, class Compare>
 	TargetRandomIt GallopLeft(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
+		//Gallop through the list checking if sourceIt
+		//	fits between 2^(i-1) and 2^i
+		//	then do a binary search within that range
 		auto AlteredComp = [&Comp](const auto &left, const auto &right) -> bool {
 			return !Comp(right,left);
 		};
@@ -124,7 +130,6 @@ namespace MergeSort {
 				auto leftValue = *leftIt;
 				auto rightValue = *rightIt;
 
-				//======================STANDARD======================
 				if (!Comp(rightValue, leftValue)) {
 					//Left list's first element is inserted
 					*insertIt = leftValue;
@@ -144,16 +149,15 @@ namespace MergeSort {
 					hitBounds = true;
 					break;
 				}
-				//====================================================
 			}
 			//Either going to enter galloping mode or hit our bounds
 			if (hitBounds) {
 				//At least one list is empty
 				break;
 			}
-			//Done with standard mode, now gallop
+			//Standard merge hit a long run, try galloping
 			do {
-				//=======================GALLOP=======================
+				//Gallop to the right first to find a position for leftIt
 				auto rightInsertIt = GallopRight(leftIt, rightIt, rightEnd, Comp);
 				auto rightRunCount = std::distance(rightIt, rightInsertIt);
 				std::copy(rightIt, rightInsertIt, insertIt);
@@ -169,6 +173,7 @@ namespace MergeSort {
 					break;
 				}
 
+				//Gallop to the left now to find a position for rightIt
 				auto leftInsertIt = GallopLeft(rightIt, leftIt, leftEnd, Comp);
 				auto leftRunCount = std::distance(leftIt, leftInsertIt);
 				std::copy(leftIt, leftInsertIt, insertIt);
@@ -185,11 +190,11 @@ namespace MergeSort {
 				}
 				//Repeat if at least one run was long enough
 			}	while (leftRunCount < MIN_GALLOP && rightRunCount < MIN_GALLOP);
-			//Either going back to standard mode or hit our bounds
 			if (hitBounds) {
 				//At least one list is empty
 				break;
 			}
+			//Going back to standard merge
 		}
 		//Now at least one list is empty
 		if (leftIt != leftEnd) {
@@ -231,6 +236,7 @@ namespace MergeSort {
 		//	According to https://svn.python.org/projects/python/trunk/Objects/listsort.txt
 
 		// newLeftBegin saved std::distance(begin, newLeftBegin)*sizeof(RandomIt) bytes of extra space usage
+		// rightEnd saved std::distance(rightEnd, end)*sizeof(RandomIt) bytes of extra space usage
 		//Save the left list in a temp because we'll be overwriting it as we insert
 		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
 		std::vector<ValueType> tempList(newLeftBegin, middle);
@@ -256,6 +262,7 @@ namespace MergeSort {
 
 		size_t length = std::distance(begin,end);
 
+		//Bottom-up merge algorithm
 		for (size_t width=1; width<length; width*=2) {
 			//We are going to merge lists of length 'width'
 			for (size_t listStart=0; listStart<length; listStart+=(width*2)) {

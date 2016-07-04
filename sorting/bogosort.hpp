@@ -23,6 +23,7 @@ namespace Bogosort {
 
 	template<class RandomIt, class Compare>
 	void SortRandom(RandomIt begin, RandomIt end, Compare comp) {
+		//While the list isn't in order, shuffle it
 		std::mt19937 eng = CreateRandomEngine();
 		while (!std::is_sorted(begin, end, comp)) {
 			std::shuffle(begin, end, eng);
@@ -35,6 +36,7 @@ namespace Bogosort {
 		// (not necessarily in lexicographical order)
 		size_t length = std::distance(begin,end);
 
+		//Create a vector to store the state of the permutation
 		std::vector<size_t> p(length);
 		{
 			size_t i = 0;

@@ -8,17 +8,15 @@
 namespace Quicksort {
 	template<class RandomIt, class Compare>
 	RandomIt GetMedian(RandomIt begin, RandomIt middle, RandomIt last, Compare Comp) {
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
-
 		if (middle == last) {
 			//If there are 2 elements, there isnt really a middle
 			//	there's either 1 or 2 elements
 			return last;
 		}
 
-		ValueType beginValue = *begin;
-		ValueType middleValue = *middle;
-		ValueType lastValue = *last;
+		auto beginValue = *begin;
+		auto middleValue = *middle;
+		auto lastValue = *last;
 
 		if (!Comp(lastValue, middleValue) && !Comp(middleValue, beginValue)) {
 			//middle is the median
@@ -35,10 +33,10 @@ namespace Quicksort {
 	template<class RandomIt, class Compare>
 	RandomIt Partition(RandomIt begin, RandomIt end, Compare Comp) {
 		size_t length = std::distance(begin,end);
-		RandomIt middle = begin + length/2;
+		auto middle = begin + length/2;
 
-		RandomIt left = std::prev(begin);
-		RandomIt right = end;
+		auto left = std::prev(begin);
+		auto right = end;
 
 		//For the pivot, use the median of the begin, right, and middle element
 		auto pivotValue = *GetMedian(begin, middle, std::prev(end), Comp);
@@ -62,6 +60,8 @@ namespace Quicksort {
 				//	everything is now on the correct side of the pivot
 				return left;
 			}
+			//Both left and right are on opposite sides
+			//	of the pivot that they should be
 			std::iter_swap(left,right);
 		}
 	}
@@ -70,7 +70,7 @@ namespace Quicksort {
 	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
 		while (std::distance(begin,end) > 1) {
 			//At least 2 elements to sort
-			RandomIt partition = Partition(begin, end, Comp);
+			auto partition = Partition(begin, end, Comp);
 			Sort(partition, end, Comp);
 			end = partition;
 		}
