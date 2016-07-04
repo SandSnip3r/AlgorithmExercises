@@ -21,7 +21,3 @@
     - Speed degrades to O(n^2)
 - Selection sort
 - Timsort
-  - No galloping yet
-
-#### Planned algorithms
-- Smoothsort
