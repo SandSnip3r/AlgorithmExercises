@@ -24,3 +24,5 @@
 - Selection sort
 - Timsort
   - Uses MergeSort's merge
+- Patience sort
+  - Uses MergeSort's merge
