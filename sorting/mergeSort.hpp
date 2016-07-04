@@ -10,7 +10,6 @@
 namespace MergeSort {
 
 	enum class MergeType { InPlace, ExtraSpace };
-	const int MIN_GALLOP = 7;
 
 	template<class RandomIt, class Compare>
 	void InPlaceMerge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
@@ -61,114 +60,24 @@ namespace MergeSort {
 		return ReversedCompare<Compare>{compare};
 	}
 
-	template<class SourceRandomIt, class TargetRandomIt, class Compare>
-	TargetRandomIt Gallop(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
-		//Gallop through the list checking if sourceIt
-		//	fits between 2^(i-1) and 2^i
-		//	then do a binary search within that range
-		auto length = std::distance(targetBegin, targetEnd);
-		auto sourceValue = *sourceIt;
-		if (!Comp(*targetBegin, sourceValue)) {
-			return targetBegin;
-		} else if (Comp(*(std::prev(targetEnd)), sourceValue)) {
-			return targetEnd;
-		}
-		for (int i=1;;++i) {
-			auto leftBoundPos = (1<<(i-1))-1;
-			auto rightBoundPos = (1<<i)-1;
-			if (rightBoundPos >= length) {
-				rightBoundPos = length-1;
-			}
-			auto leftBound = targetBegin + leftBoundPos;
-			auto rightBound = targetBegin + rightBoundPos;
-			if (Comp(*leftBound, sourceValue) && !Comp(*rightBound, sourceValue)) {
-				auto resultingPos = std::lower_bound(leftBound, std::next(rightBound), sourceValue, Comp);
-				return resultingPos;
-			}
-		}
-	}
-
 	template<class LeftRandomIt, class RightRandomIt, class InsertRandomIt, class Compare>
 	void MergeInto(LeftRandomIt leftIt, LeftRandomIt leftEnd, RightRandomIt rightIt, RightRandomIt rightEnd, InsertRandomIt insertIt, Compare Comp) {
 		//Begin merging
-		while (1) {
-			int leftRunCount = 0;
-			int rightRunCount = 0;
-			bool hitBounds = false;
-			while (leftRunCount < MIN_GALLOP && rightRunCount < MIN_GALLOP) {
-				//While there are elements in both lists
-				auto leftValue = *leftIt;
-				auto rightValue = *rightIt;
+		while (leftIt != leftEnd && rightIt != rightEnd) {
+			//While there are elements in both lists
+			auto leftValue = *leftIt;
+			auto rightValue = *rightIt;
 
-				if (!Comp(rightValue, leftValue)) {
-					//Left list's first element is inserted
-					*insertIt = leftValue;
-					++leftIt;
-					++leftRunCount;
-					rightRunCount = 0;
-				} else {
-					//Right list's first element is inserted
-					*insertIt = rightValue;
-					++rightIt;
-					++rightRunCount;
-					leftRunCount = 0;
-				}
-				++insertIt;
-				if (leftIt == leftEnd || rightIt == rightEnd) {
-					//At least one list is empty
-					hitBounds = true;
-					break;
-				}
-			}
-			//Either going to enter galloping mode or hit our bounds
-			if (hitBounds) {
-				//At least one list is empty
-				break;
-			}
-			//Standard merge hit a long run, try galloping
-			do {
-				//Gallop to the right first to find a position for leftIt
-				auto rightInsertIt = Gallop(leftIt, rightIt, rightEnd, Comp);
-				auto rightRunCount = std::distance(rightIt, rightInsertIt);
-				std::move(rightIt, rightInsertIt, insertIt);
-				std::advance(insertIt, rightRunCount);
-				std::advance(rightIt, rightRunCount);
-				*insertIt = *leftIt;
+			if (!Comp(rightValue, leftValue)) {
+				//Left list's first element is inserted
+				*insertIt = leftValue;
 				++leftIt;
-				++insertIt;
-
-				if (leftIt == leftEnd || rightIt == rightEnd) {
-					//At least one list is empty
-					hitBounds = true;
-					break;
-				}
-
-				//Gallop to the left now to find a position for rightIt
-				//	Pass an altered Comp function to preserve stability
-				auto AlteredComp = [&Comp](const auto &left, const auto &right) -> bool {
-					return !Comp(right,left);
-				};
-				auto leftInsertIt = Gallop(rightIt, leftIt, leftEnd, AlteredComp);
-				auto leftRunCount = std::distance(leftIt, leftInsertIt);
-				std::move(leftIt, leftInsertIt, insertIt);
-				std::advance(insertIt, leftRunCount);
-				std::advance(leftIt, leftRunCount);
-				*insertIt = *rightIt;
+			} else {
+				//Right list's first element is inserted
+				*insertIt = rightValue;
 				++rightIt;
-				++insertIt;
-
-				if (leftIt == leftEnd || rightIt == rightEnd) {
-					//At least one list is empty
-					hitBounds = true;
-					break;
-				}
-				//Repeat if at least one run was long enough
-			}	while (leftRunCount < MIN_GALLOP && rightRunCount < MIN_GALLOP);
-			if (hitBounds) {
-				//At least one list is empty
-				break;
 			}
-			//Going back to standard merge
+			++insertIt;
 		}
 		//Now at least one list is empty
 		if (leftIt != leftEnd) {
