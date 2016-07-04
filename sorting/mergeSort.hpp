@@ -7,8 +7,6 @@
 #include <iterator>
 #include <vector>
 
-#include <iostream>
-
 namespace MergeSort {
 
 	enum class MergeType { InPlace, ExtraSpace };
@@ -17,7 +15,7 @@ namespace MergeSort {
 	template<class RandomIt, class Compare>
 	void InPlaceMerge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
 		while (middle != end) {
-			while (begin != middle && Comp(*begin, *middle)) {
+			while (begin != middle && !Comp(*middle, *begin)) {
 				++begin;
 			}
 			if (begin == middle) {
