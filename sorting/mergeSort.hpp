@@ -62,7 +62,7 @@ namespace MergeSort {
 	}
 
 	template<class SourceRandomIt, class TargetRandomIt, class Compare>
-	TargetRandomIt GallopRight(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
+	TargetRandomIt Gallop(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
 		//Gallop through the list checking if sourceIt
 		//	fits between 2^(i-1) and 2^i
 		//	then do a binary search within that range
@@ -83,36 +83,6 @@ namespace MergeSort {
 			auto rightBound = targetBegin + rightBoundPos;
 			if (Comp(*leftBound, sourceValue) && !Comp(*rightBound, sourceValue)) {
 				auto resultingPos = std::lower_bound(leftBound, std::next(rightBound), sourceValue, Comp);
-				return resultingPos;
-			}
-		}
-	}
-
-	template<class SourceRandomIt, class TargetRandomIt, class Compare>
-	TargetRandomIt GallopLeft(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
-		//Gallop through the list checking if sourceIt
-		//	fits between 2^(i-1) and 2^i
-		//	then do a binary search within that range
-		auto AlteredComp = [&Comp](const auto &left, const auto &right) -> bool {
-			return !Comp(right,left);
-		};
-		auto length = std::distance(targetBegin, targetEnd);
-		auto sourceValue = *sourceIt;
-		if (!AlteredComp(*targetBegin, sourceValue)) {
-			return targetBegin;
-		} else if (AlteredComp(*(std::prev(targetEnd)), sourceValue)) {
-			return targetEnd;
-		}
-		for (int i=1;;++i) {
-			auto leftBoundPos = (1<<(i-1))-1;
-			auto rightBoundPos = (1<<i)-1;
-			if (rightBoundPos >= length) {
-				rightBoundPos = length-1;
-			}
-			auto leftBound = targetBegin + leftBoundPos;
-			auto rightBound = targetBegin + rightBoundPos;
-			if (AlteredComp(*leftBound, sourceValue) && !AlteredComp(*rightBound, sourceValue)) {
-				auto resultingPos = std::lower_bound(leftBound, std::next(rightBound), sourceValue, AlteredComp);
 				return resultingPos;
 			}
 		}
@@ -158,9 +128,9 @@ namespace MergeSort {
 			//Standard merge hit a long run, try galloping
 			do {
 				//Gallop to the right first to find a position for leftIt
-				auto rightInsertIt = GallopRight(leftIt, rightIt, rightEnd, Comp);
+				auto rightInsertIt = Gallop(leftIt, rightIt, rightEnd, Comp);
 				auto rightRunCount = std::distance(rightIt, rightInsertIt);
-				std::copy(rightIt, rightInsertIt, insertIt);
+				std::move(rightIt, rightInsertIt, insertIt);
 				std::advance(insertIt, rightRunCount);
 				std::advance(rightIt, rightRunCount);
 				*insertIt = *leftIt;
@@ -174,9 +144,13 @@ namespace MergeSort {
 				}
 
 				//Gallop to the left now to find a position for rightIt
-				auto leftInsertIt = GallopLeft(rightIt, leftIt, leftEnd, Comp);
+				//	Pass an altered Comp function to preserve stability
+				auto AlteredComp = [&Comp](const auto &left, const auto &right) -> bool {
+					return !Comp(right,left);
+				};
+				auto leftInsertIt = Gallop(rightIt, leftIt, leftEnd, AlteredComp);
 				auto leftRunCount = std::distance(leftIt, leftInsertIt);
-				std::copy(leftIt, leftInsertIt, insertIt);
+				std::move(leftIt, leftInsertIt, insertIt);
 				std::advance(insertIt, leftRunCount);
 				std::advance(leftIt, leftRunCount);
 				*insertIt = *rightIt;
