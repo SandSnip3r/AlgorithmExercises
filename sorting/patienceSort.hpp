@@ -35,28 +35,28 @@ namespace PatienceSort {
 		auto it = begin;
 		while (it != end) {
 			auto itValue = *it;
-			bool pileFound = false;
-			for (size_t pileNum=0; pileNum<piles.size(); ++pileNum) {
-				if (!Comp(itValue, piles.at(pileNum).back())) {
-					piles.at(pileNum).emplace_back(itValue);
-					pileFound = true;
-					break;
-				}
-			}
-			if (!pileFound) {
-				//Couldnt find a pile for this card,
-				//	make a new pile with just this card
+			//Do a binary search to see which pile this item goes in
+			auto pileIt = std::upper_bound(piles.begin(), piles.end(), itValue, [&Comp](const ValueType &value, const std::vector<ValueType> &pile) {
+				return Comp(value, pile.back());
+			});
+			if (pileIt == piles.end()) {
+				//List not found, make a new one with just this value
 				piles.emplace_back(std::vector<ValueType>{itValue});
+			} else {
+				//List found, add this value to it
+				pileIt->emplace_back(itValue);
 			}
 			++it;
 		}
-		//Now we have 'piles.size()' sorted lists
+		//Now we have 'piles.size()' reverse-sorted lists
 		//Move them all back into the orignal list so they can be merged
 		std::vector<std::pair<RandomIt,RandomIt>> sortedListIteratorPairList;
 		it = begin;
 		for (auto &pile : piles) {
 			auto pileSize = pile.size();
-			std::move(pile.begin(), pile.end(), it);
+			//Move using reverse iterators so the pile is back in order
+			std::move(pile.rbegin(), pile.rend(), it);
+			//Store the iterator pair to be used when merging
 			sortedListIteratorPairList.emplace_back(it, std::next(it, pileSize));
 			std::advance(it, pileSize);
 		}
