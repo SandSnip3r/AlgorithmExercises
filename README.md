@@ -18,11 +18,11 @@
 - Merge sort
   - Implemented using a bottom-up approach (non-recursive)
   - Main merge method uses no more than n/2 extra space
-    - Galloping also implemented (concept from Timsort)
   - In-place merge method also implemented just in case memory is a concern
     - Speed degrades to O(n^2)
 - Selection sort
 - Timsort
-  - Uses MergeSort's merge
+  - Uses specialized merge (galloping)
 - Patience sort
   - Uses MergeSort's merge
+  - Binary search to find proper pile
