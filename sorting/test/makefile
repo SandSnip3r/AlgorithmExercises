@@ -9,13 +9,13 @@ all: googleTest timeTest
 googleTest: googleTest.o
 	$(CC) -o googleTest googleTest.o -lgtest -lgtest_main -pthread  $(CFLAGS)
 
-googleTest.o: ../bogosort.hpp ../bubbleSort.hpp ../heapsort.hpp ../insertionSort.hpp ../introsort.hpp ../mergeSort.hpp ../quicksort.hpp ../selectionSort.hpp ../timsort.hpp googleTest.cpp
+googleTest.o: ../bogosort.hpp ../bubbleSort.hpp ../heapsort.hpp ../insertionSort.hpp ../introsort.hpp ../mergeSort.hpp ../patienceSort.hpp ../quicksort.hpp ../selectionSort.hpp ../timsort.hpp googleTest.cpp
 	$(CC) -c googleTest.cpp -I../ $(CFLAGS)
 
 timeTest: timeTest.o
 	$(CC) -o timeTest timeTest.o $(CFLAGS)
 
-timeTest.o: ../bogosort.hpp ../bubbleSort.hpp ../heapsort.hpp ../insertionSort.hpp ../introsort.hpp ../mergeSort.hpp ../quicksort.hpp ../selectionSort.hpp ../timsort.hpp timeTest.cpp ../../utilites/timeUtility.hpp
+timeTest.o: ../bogosort.hpp ../bubbleSort.hpp ../heapsort.hpp ../insertionSort.hpp ../introsort.hpp ../mergeSort.hpp ../patienceSort.hpp ../quicksort.hpp ../selectionSort.hpp ../timsort.hpp timeTest.cpp ../../utilites/timeUtility.hpp
 	$(CC) -c timeTest.cpp -I../../utilites/ -I../ $(CFLAGS)
 
 clean:
