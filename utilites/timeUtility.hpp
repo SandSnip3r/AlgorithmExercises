@@ -1,5 +1,4 @@
 #include <chrono>
-#include <iostream>
 
 template<class DurationType>
 class Timer {
