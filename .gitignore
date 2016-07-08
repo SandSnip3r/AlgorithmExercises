@@ -1,3 +1,5 @@
 **/*.o
 sorting/test/timeTest
 sorting/test/googleTest
+trees/test/timeTest
+trees/test/googleTest
