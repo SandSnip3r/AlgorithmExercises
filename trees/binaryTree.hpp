@@ -2,6 +2,7 @@
 #define BINARYTREE_HPP 1
 
 #include <iostream>
+#include <queue>
 #include <memory>
 
 namespace BinaryTree {
@@ -11,39 +12,89 @@ namespace BinaryTree {
 	private:
 		struct Node {
 			T data;
-			std::shared_ptr<Node> leftChild{nullptr};
-			std::shared_ptr<Node> rightChild{nullptr};
+			std::unique_ptr<Node> leftChild;
+			std::unique_ptr<Node> rightChild;
 			Node(const T &d) : data(d) {};
 		};
-		std::shared_ptr<Node> root;
+		std::unique_ptr<Node> root;
+		size_t size{0}, height{0};
+		void PrintInOrder(std::unique_ptr<Node> &n);
 	public:
-		BinaryTree();
 		void Insert(const T &obj);
+		size_t Size() const;
+		size_t Height() const;
+		void PrintInOrder();
+		void PrintBreadth();
 	};
 
 	template<class T>
-	BinaryTree<T>::BinaryTree() : root(nullptr) {
-	}	
-
-	template<class T>
 	void BinaryTree<T>::Insert(const T &obj) {
-		std::cout << "Inserting " << obj << std::endl;
-		std::shared_ptr<Node> tempRoot = root;
+		std::unique_ptr<Node> *tempRoot = &root;
+		size_t insertionDepth = 1;
 		while (1) {
-			if (!tempRoot) {
+			if (!(*tempRoot)) {
 				//We've reached the point to create this node
-				std::cout << "tempRoot " << static_cast<bool>(tempRoot) << std::endl;
-				tempRoot.reset(new Node(obj));
-				std::cout << "tempRoot " << static_cast<bool>(tempRoot) << std::endl;
-				std::cout << "root " << static_cast<bool>(root) << std::endl;
+				tempRoot->reset(new Node(obj));
+				++size;
+				if (insertionDepth > height) {
+					height = insertionDepth;
+				}
 				return;
-			} else if (obj < tempRoot->data) {
-				tempRoot = tempRoot->leftChild;
+			} else if (obj < (*tempRoot)->data) {
+				tempRoot = &((*tempRoot)->leftChild);
+				++insertionDepth;
 			} else {
-				tempRoot = tempRoot->rightChild;
+				tempRoot = &((*tempRoot)->rightChild);
+				++insertionDepth;
 			}
 		}
 	}
+
+	template<class T>
+	size_t BinaryTree<T>::Size() const {
+		return size;
+	}
+
+	template<class T>
+	size_t BinaryTree<T>::Height() const {
+		return height;
+	}
+
+	template<class T>
+	void BinaryTree<T>::PrintBreadth() {
+		std::queue<std::unique_ptr<Node>*> nodes;
+		nodes.emplace(&root);
+		while (!nodes.empty()) {
+			std::unique_ptr<Node> *n = nodes.front();
+			nodes.pop();
+			if (*n) {
+				std::cout << (*n)->data << " ";
+				nodes.push(&((*n)->leftChild));
+				nodes.push(&((*n)->rightChild));
+			} else {
+				//Nothing here
+			}
+		}
+		std::cout << std::endl;
+	}
+
+	template<class T>
+	void BinaryTree<T>::PrintInOrder() {
+		PrintInOrder(root);
+		std::cout << std::endl;
+	}
+
+	template<class T>
+	void BinaryTree<T>::PrintInOrder(std::unique_ptr<Node> &n) {
+		if (n) {
+			PrintInOrder(n->leftChild);
+			std::cout << n->data << " ";
+			PrintInOrder(n->rightChild);
+		} else {
+			//Nothing here
+		}
+	}
+
 } //namespace BinaryTree
 
 #endif //BINARYTREE_HPP
