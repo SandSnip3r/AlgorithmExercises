@@ -21,7 +21,9 @@ namespace Bogosort {
 		return std::mt19937(s);
 	}
 
-	template<class RandomIt, class Compare>
+	template<class RandomIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::random_access_iterator_tag, typename std::iterator_traits<RandomIt>::iterator_category>::value>>
+	//std::is_sorted requires RandomIt to be a ForwardIterator
+	//std::shuffle requires RandomIt to be a RandomIterator
 	void SortRandom(RandomIt begin, RandomIt end, Compare comp) {
 		//While the list isn't in order, shuffle it
 		std::mt19937 eng = CreateRandomEngine();
@@ -30,8 +32,10 @@ namespace Bogosort {
 		}
 	}
 
-	template<class RandomIt, class Compare>
-	void SortPermute(RandomIt begin, RandomIt end, Compare comp) {
+	template<class ForwardIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<ForwardIt>::iterator_category>::value>>
+	//std::distance requires ForwardIt to be a InputIterator
+	//std::is_sorted and std::iter_swap require ForwardIt to be a ForwardIterator
+	void SortPermute(ForwardIt begin, ForwardIt end, Compare comp) {
 		//This method will iteratate through every permutation of the list possible
 		// (not necessarily in lexicographical order)
 		size_t length = std::distance(begin,end);
@@ -51,7 +55,7 @@ namespace Bogosort {
 			if (i%2 == 1) {
 				j = p.at(i);
 			}
-			std::iter_swap((begin+i), (begin+j));
+			std::iter_swap(std::next(begin,i), std::next(begin,j));
 			i = 1;
 			while (i < length && p.at(i) == 0) {
 				p.at(i) = i;
