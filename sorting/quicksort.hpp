@@ -6,8 +6,8 @@
 #include <vector>
 
 namespace Quicksort {
-	template<class RandomIt, class Compare>
-	RandomIt GetMedian(RandomIt begin, RandomIt middle, RandomIt last, Compare Comp) {
+	template<class InputIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<InputIt>::iterator_category>::value>>
+	InputIt GetMedian(InputIt begin, InputIt middle, InputIt last, Compare Comp) {
 		if (middle == last) {
 			//If there are 2 elements, there isnt really a middle
 			//	there's either 1 or 2 elements
@@ -30,10 +30,13 @@ namespace Quicksort {
 		}
 	}
 
-	template<class RandomIt, class Compare>
-	RandomIt Partition(RandomIt begin, RandomIt end, Compare Comp) {
+	template<class BidirIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::distance, std::next, and GetMedian require the passed iterator to be an InputIterator
+	//std::iter_swap requires the passed iterator to be a ForwardIterator
+	//std::prev requires the passed iterator to be an BidirectionalIterator
+	BidirIt Partition(BidirIt begin, BidirIt end, Compare Comp) {
 		size_t length = std::distance(begin,end);
-		auto middle = begin + length/2;
+		auto middle = std::next(begin, length/2);
 
 		auto left = std::prev(begin);
 		auto right = end;
@@ -66,8 +69,10 @@ namespace Quicksort {
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<>>
-	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
+	template<class BidirIt, class Compare = std::less<>, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::distance requires the passed iterator to be an InputIterator
+	//Partition requires the passed iterator to be an BidirectionalIterator
+	void Sort(BidirIt begin, BidirIt end, Compare Comp = Compare()) {
 		while (std::distance(begin,end) > 1) {
 			//At least 2 elements to sort
 			auto partition = Partition(begin, end, Comp);
