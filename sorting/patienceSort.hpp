@@ -9,8 +9,9 @@
 
 namespace PatienceSort {
 
-	template<class RandomIt, class Compare>
-	void MergePiles(std::vector<std::pair<RandomIt,RandomIt>> iteratorPairList, Compare Comp) {
+	template<class BidirIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//MergeSort::Merge requires the passed iterator to be an BidirectionalIterator
+	void MergePiles(std::vector<std::pair<BidirIt,BidirIt>> iteratorPairList, Compare Comp) {
 		size_t length;
 		while ((length = iteratorPairList.size()) > 1) {
 			for (size_t i=1; i<length; i+=2) {
@@ -27,9 +28,13 @@ namespace PatienceSort {
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<>>
-	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+	template<class BidirIt, class Compare = std::less<>, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::advance requires the passed iterators to be an InputIterator
+	//std::move requires the passed iterators to be an OutputIterator
+	//std::upper_bound requires the passed iterator to be an ForwardIterator
+	//MergePiles requires the passed iterator to be an BidirectionalIterator
+	void Sort(BidirIt begin, BidirIt end, Compare Comp = Compare()) {
+		using ValueType = typename std::iterator_traits<BidirIt>::value_type;
 		std::vector<std::vector<ValueType>> piles;
 
 		auto it = begin;
@@ -50,7 +55,7 @@ namespace PatienceSort {
 		}
 		//Now we have 'piles.size()' reverse-sorted lists
 		//Move them all back into the orignal list so they can be merged
-		std::vector<std::pair<RandomIt,RandomIt>> sortedListIteratorPairList;
+		std::vector<std::pair<BidirIt,BidirIt>> sortedListIteratorPairList;
 		it = begin;
 		for (auto &pile : piles) {
 			auto pileSize = pile.size();
