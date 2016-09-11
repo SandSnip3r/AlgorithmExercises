@@ -12,8 +12,11 @@ namespace Introsort {
 
 	const size_t SORT_THRESHOLD = 16;
 
-	template<class RandomIt, class Compare>
-	void SortLimitedDepth(RandomIt begin, RandomIt end, int depthLimit, Compare Comp) {
+	template<class BidirIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::distance and std::find_if_not require the passed iterator to be an InputIterator
+	//std::rotate requires the passed iterator to be an ForwardIterator
+	//Heapsort::sort, std::reverse_iterator, and Quicksort::Partition require the passed iterator to be an BidirectionalIterator
+	void SortLimitedDepth(BidirIt begin, BidirIt end, int depthLimit, Compare Comp) {
 		//This method uses a while loop to continually sort the
 		//	left half of the list and recursively sort the right,
 		//	rather than recursively sorting both
@@ -26,14 +29,15 @@ namespace Introsort {
 			}
 			--depthLimit;
 			//Didnt hit the depth limit yet, continue quicksort
-			RandomIt partition = Quicksort::Partition(begin, end, Comp);
+			BidirIt partition = Quicksort::Partition(begin, end, Comp);
 			SortLimitedDepth(partition, end, depthLimit, Comp);
 			end = partition;
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<>>
-	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
+	template<class BidirIt, class Compare = std::less<>, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//SortLimitedDepth and InsertionSort::Sort require the passed iterator to be an BidirectionalIterator
+	void Sort(BidirIt begin, BidirIt end, Compare Comp = Compare()) {
 		size_t length = std::distance(begin,end);
 
 		if (length < 2) {

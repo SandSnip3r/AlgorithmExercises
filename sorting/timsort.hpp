@@ -9,14 +9,16 @@ namespace Timsort {
 
 	const int MIN_GALLOP = 7;
 
-	template <class RandomIt>
-	RandomIt ReverseIt(std::reverse_iterator<RandomIt> it) {
+	template <class BidirIt, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::reverse_iterator requires the passed iterator to be an BidirectionalIterator
+	BidirIt ReverseIt(std::reverse_iterator<BidirIt> it) {
 		return it.base();
 	}
 
-	template <class RandomIt>
-	std::reverse_iterator<RandomIt> ReverseIt(RandomIt it) {
-		return std::reverse_iterator<RandomIt>(it);
+	template <class BidirIt, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::reverse_iterator requires the passed iterator to be an BidirectionalIterator
+	std::reverse_iterator<BidirIt> ReverseIt(BidirIt it) {
+		return std::reverse_iterator<BidirIt>(it);
 	}
 
 	template<class Compare>
@@ -38,8 +40,11 @@ namespace Timsort {
 		return ReversedCompare<Compare>{compare};
 	}
 
-	template<class SourceRandomIt, class TargetRandomIt, class Compare>
-	TargetRandomIt Gallop(SourceRandomIt sourceIt, TargetRandomIt targetBegin, TargetRandomIt targetEnd, Compare Comp) {
+	template<class SourceInputIt, class TargetForwardIt, class Compare, typename = std::enable_if_t< std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<TargetForwardIt>::iterator_category>::value &&
+																																																		std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<SourceInputIt>::iterator_category>::value>>
+	//std::distance and std::next require the passed iterator to be an InputIterator
+	//std::lower_bound requires the passed iterator to be an ForwardIterator
+	TargetForwardIt Gallop(SourceInputIt sourceIt, TargetForwardIt targetBegin, TargetForwardIt targetEnd, Compare Comp) {
 		//Gallop through the list checking if sourceIt
 		//	fits between 2^(i-1) and 2^i
 		//	then do a binary search within that range
@@ -56,8 +61,8 @@ namespace Timsort {
 			if (rightBoundPos >= length) {
 				rightBoundPos = length-1;
 			}
-			auto leftBound = targetBegin + leftBoundPos;
-			auto rightBound = targetBegin + rightBoundPos;
+			auto leftBound = std::next(targetBegin, leftBoundPos);
+			auto rightBound = std::next(targetBegin, rightBoundPos);
 			if (Comp(*leftBound, sourceValue) && !Comp(*rightBound, sourceValue)) {
 				auto resultingPos = std::lower_bound(leftBound, std::next(rightBound), sourceValue, Comp);
 				return resultingPos;
@@ -65,8 +70,12 @@ namespace Timsort {
 		}
 	}
 
-	template<class LeftRandomIt, class RightRandomIt, class InsertRandomIt, class Compare>
-	void MergeInto(LeftRandomIt leftIt, LeftRandomIt leftEnd, RightRandomIt rightIt, RightRandomIt rightEnd, InsertRandomIt insertIt, Compare Comp) {
+	template<class LeftForwardIt, class RightForwardIt, class InsertForwardIt, class Compare, typename = std::enable_if_t< std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<LeftForwardIt>::iterator_category>::value &&
+																																																												std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<RightForwardIt>::iterator_category>::value &&
+																																																												std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<InsertForwardIt>::iterator_category>::value>>
+	//std::move and std::advance require the passed iterators to be InputIterators and an OutputIterator
+	//Gallop requires the passed iterator to be an ForwardIterator
+	void MergeInto(LeftForwardIt leftIt, LeftForwardIt leftEnd, RightForwardIt rightIt, RightForwardIt rightEnd, InsertForwardIt insertIt, Compare Comp) {
 		//Begin merging
 		while (1) {
 			int leftRunCount = 0;
@@ -157,8 +166,10 @@ namespace Timsort {
 		}
 	}
 
-	template<class RandomIt, class Compare>
-	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+	template<class ForwardIt, class Compare, typename = std::enable_if_t< std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<ForwardIt>::iterator_category>::value>>
+	//std::distance requires the passed iterator to be an InputIterator
+	//MergeInto and std::upper_bound require the passed iterator to be a ForwardIterator
+	void Merge(ForwardIt begin, ForwardIt middle, ForwardIt end, Compare Comp) {
 		size_t leftLength = std::distance(begin, middle);
 		size_t rightLength = std::distance(middle, end);
 
@@ -186,10 +197,10 @@ namespace Timsort {
 		//	time, copying, and memory savings when they do pay"
 		//	According to https://svn.python.org/projects/python/trunk/Objects/listsort.txt
 
-		// newLeftBegin saved std::distance(begin, newLeftBegin)*sizeof(RandomIt) bytes of extra space usage
-		// rightEnd saved std::distance(rightEnd, end)*sizeof(RandomIt) bytes of extra space usage
+		// newLeftBegin saved std::distance(begin, newLeftBegin)*sizeof(ForwardIt) bytes of extra space usage
+		// rightEnd saved std::distance(rightEnd, end)*sizeof(ForwardIt) bytes of extra space usage
 		//Save the left list in a temp because we'll be overwriting it as we insert
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		using ValueType = typename std::iterator_traits<ForwardIt>::value_type;
 		std::vector<ValueType> tempList(newLeftBegin, middle);
 		auto leftIt = tempList.begin();
 		auto leftEnd = tempList.end();
@@ -201,11 +212,11 @@ namespace Timsort {
 		MergeInto(leftIt, leftEnd, rightIt, rightEnd, insertIt, Comp);
 	}
 
-	template<class RandomIt>
+	template<class Iterator>
 	struct Run {
-		RandomIt begin;
+		Iterator begin;
 		size_t length;
-		Run(RandomIt b, size_t l) : begin(b), length(l) {};
+		Run(Iterator b, size_t l) : begin(b), length(l) {};
 	};
 
 	size_t CalculateMinrun(size_t length) {
@@ -225,8 +236,10 @@ namespace Timsort {
 		return mostSignificant6 + extraBit;
 	}
 
-	template<class RandomIt, class Compare>
-	size_t FindExistingRunLength(RandomIt begin, RandomIt end, Compare Comp) {
+	template<class BidirIt, class Compare, typename = std::enable_if_t< std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::distance requires the passed iterator to be an InputIterator
+	//std::reverse requires the passed iterator to be an BidirectionalIterator
+	size_t FindExistingRunLength(BidirIt begin, BidirIt end, Compare Comp) {
 		size_t length = std::distance(begin,end);
 		if (length < 2) {
 			return length;
@@ -253,15 +266,16 @@ namespace Timsort {
 		return std::distance(begin,runIt);
 	}
 
-	template<class RandomIt, class Compare>
-	void MaintainStackInvariants(std::stack<Run<RandomIt>> *runStack, Compare Comp) {
+	template<class ForwardIt, class Compare, typename = std::enable_if_t< std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<ForwardIt>::iterator_category>::value>>
+	//Merge requires the passed iterator to be a ForwardIterator
+	void MaintainStackInvariants(std::stack<Run<ForwardIt>> *runStack, Compare Comp) {
 		while (runStack->size() >= 3) {
 			//Pop the top three off the stack
-			Run<RandomIt> a = runStack->top();
+			Run<ForwardIt> a = runStack->top();
 			runStack->pop();
-			Run<RandomIt> b = runStack->top();
+			Run<ForwardIt> b = runStack->top();
 			runStack->pop();
-			Run<RandomIt> c = runStack->top();
+			Run<ForwardIt> c = runStack->top();
 			runStack->pop();
 
 			if ((a.length<=(b.length+c.length)) || (b.length<=c.length)) {
@@ -284,13 +298,14 @@ namespace Timsort {
 		}
 	}
 
-	template<class RandomIt, class Compare>
-	void MergeRemainingOnStack(std::stack<Run<RandomIt>> *runStack, Compare Comp) {
+	template<class ForwardIt, class Compare, typename = std::enable_if_t< std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<ForwardIt>::iterator_category>::value>>
+	//Merge requires the passed iterator to be a ForwardIterator
+	void MergeRemainingOnStack(std::stack<Run<ForwardIt>> *runStack, Compare Comp) {
 		while (runStack->size() >= 2) {
 			//Pop top 2 off stack
-			Run<RandomIt> a = runStack->top();
+			Run<ForwardIt> a = runStack->top();
 			runStack->pop();
-			Run<RandomIt> b = runStack->top();
+			Run<ForwardIt> b = runStack->top();
 			runStack->pop();
 
 			//Merge them then push the result
@@ -300,12 +315,15 @@ namespace Timsort {
 		}
 	}
 
-	template<class RandomIt, class Compare = std::less<>>
-	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
+	template<class BidirIt, class Compare = std::less<>, typename = std::enable_if_t< std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::distance requires the passed iterator to be an InputIterator
+	//MaintainStackInvariants and MergeRemainingOnStack requires the passed iterator to be a ForwardIterator
+	//FindExistingRunLength and InsertionSort::Sort requires the passed iterator to be an BidirectionalIterator
+	void Sort(BidirIt begin, BidirIt end, Compare Comp = Compare()) {
 		size_t length = std::distance(begin,end);
 		const size_t minRunLength = CalculateMinrun(length);
 
-		std::stack<Run<RandomIt>> runStack;
+		std::stack<Run<BidirIt>> runStack;
 
 		size_t runStart = 0;
 
