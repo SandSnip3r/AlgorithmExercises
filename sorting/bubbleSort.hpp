@@ -5,22 +5,27 @@
 
 namespace BubbleSort {
 
-	template<class RandomIt, class Compare = std::less<>>
-	void Sort(RandomIt begin, RandomIt end, Compare Comp = Compare()) {
-		size_t length = std::distance(begin, end);
-		size_t firstInOrderPosition = length;
+	template<class ForwardIt, class Compare = std::less<>, typename = std::enable_if_t<std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<ForwardIt>::iterator_category>::value>>
+	//std::distance, std::next, and std::prev require the passed iterator to be an InputIterator
+	//std::iter_swap requires the passed iterator to be a ForwardIterator
+	void Sort(ForwardIt begin, ForwardIt end, Compare Comp = Compare()) {
+		ForwardIt tempEnd = end;
 
-		while (firstInOrderPosition > 0) {
-			size_t newFirst = 0;
-			for (size_t i=1; i<firstInOrderPosition; ++i) {
-				//"Bubble" up the (i-1)th element to just before 'firstInOrderPosition'
-				if (Comp(*(begin+i), *(begin+(i-1)))) {
-					std::iter_swap(begin+(i-1), begin+i);
-					newFirst = i;
+		while (std::distance(begin, tempEnd) > 1) {
+			//A potentially unsorted list exist [begin,tempEnd) with length at least 2
+			ForwardIt it = std::next(begin);
+			ForwardIt newTempEnd = std::prev(tempEnd);
+			while (it != tempEnd) {
+				ForwardIt previousIt = std::prev(it);
+				if (Comp(*it, *previousIt)) {
+					//need to swap because 'previousIt' belongs to the right of 'it'
+					std::iter_swap(it, previousIt);
+					newTempEnd = std::next(it);
 				}
+				++it;
 			}
-			//Update 'firstInOrderPosition' for the next iteration
-			firstInOrderPosition = newFirst;
+			//move the end to the left up until the most recent swap
+			tempEnd = newTempEnd;
 		}
 	}
 }
