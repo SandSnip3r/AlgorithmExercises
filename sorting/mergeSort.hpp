@@ -11,8 +11,10 @@ namespace MergeSort {
 
 	enum class MergeType { InPlace, ExtraSpace };
 
-	template<class RandomIt, class Compare>
-	void InPlaceMerge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+	template<class ForwardIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::forward_iterator_tag, typename std::iterator_traits<ForwardIt>::iterator_category>::value>>
+	//std::next requires the passed iterator to be an InputIterator
+	//std::rotate requires the passed iterator to be an ForwardIterator
+	void InPlaceMerge(ForwardIt begin, ForwardIt middle, ForwardIt end, Compare Comp) {
 		while (middle != end) {
 			while (begin != middle && !Comp(*middle, *begin)) {
 				++begin;
@@ -24,21 +26,23 @@ namespace MergeSort {
 				//Need to do a rotate
 				//	This moves 'middle' to the position of 'begin',
 				//	and shifts [begin, middle) to the right one
-				std::rotate(begin, middle, middle+1);
+				std::rotate(begin, middle, std::next(middle));
 				++begin;
 				++middle;
 			}
 		}
 	}
 
-	template <class RandomIt>
-	RandomIt ReverseIt(std::reverse_iterator<RandomIt> it) {
+	template <class BidirIt, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::reverse_iterator requires the passed iterator to be an BidirectionalIterator
+	BidirIt ReverseIt(std::reverse_iterator<BidirIt> it) {
 		return it.base();
 	}
 
-	template <class RandomIt>
-	std::reverse_iterator<RandomIt> ReverseIt(RandomIt it) {
-		return std::reverse_iterator<RandomIt>(it);
+	template <class BidirIt, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::reverse_iterator requires the passed iterator to be an BidirectionalIterator
+	std::reverse_iterator<BidirIt> ReverseIt(BidirIt it) {
+		return std::reverse_iterator<BidirIt>(it);
 	}
 
 	template<class Compare>
@@ -60,8 +64,11 @@ namespace MergeSort {
 		return ReversedCompare<Compare>{compare};
 	}
 
-	template<class LeftRandomIt, class RightRandomIt, class InsertRandomIt, class Compare>
-	void MergeInto(LeftRandomIt leftIt, LeftRandomIt leftEnd, RightRandomIt rightIt, RightRandomIt rightEnd, InsertRandomIt insertIt, Compare Comp) {
+	template<class LeftInputIt, class RightInputIt, class OutputIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<LeftInputIt>::iterator_category>::value
+																																																					&& std::is_base_of<std::input_iterator_tag, typename std::iterator_traits<RightInputIt>::iterator_category>::value
+																																																					/*&& std::is_base_of<std::output_iterator_tag, typename std::iterator_traits<OutputIt>::iterator_category>::value*/>>
+	//std::move requires the passed iterators to be an InputIterator and OutputIterator
+	void MergeInto(LeftInputIt leftIt, LeftInputIt leftEnd, RightInputIt rightIt, RightInputIt rightEnd, OutputIt insertIt, Compare Comp) {
 		//Begin merging
 		while (leftIt != leftEnd && rightIt != rightEnd) {
 			//While there are elements in both lists
@@ -89,8 +96,11 @@ namespace MergeSort {
 		}
 	}
 
-	template<class RandomIt, class Compare>
-	void Merge(RandomIt begin, RandomIt middle, RandomIt end, Compare Comp) {
+	template<class BidirIt, class Compare, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::distance requires the passed iterator to be an InputIterator
+	//std::upper_bound requires the passed iterator to be an ForwardIterator
+	//std::prev and ReverseIt require the passed iterator to be an BidirectionalIterator
+	void Merge(BidirIt begin, BidirIt middle, BidirIt end, Compare Comp) {
 		size_t leftLength = std::distance(begin, middle);
 		size_t rightLength = std::distance(middle, end);
 
@@ -118,10 +128,10 @@ namespace MergeSort {
 		//	time, copying, and memory savings when they do pay"
 		//	According to https://svn.python.org/projects/python/trunk/Objects/listsort.txt
 
-		// newLeftBegin saved std::distance(begin, newLeftBegin)*sizeof(RandomIt) bytes of extra space usage
-		// rightEnd saved std::distance(rightEnd, end)*sizeof(RandomIt) bytes of extra space usage
+		// newLeftBegin saved std::distance(begin, newLeftBegin)*sizeof(BidirIt) bytes of extra space usage
+		// rightEnd saved std::distance(rightEnd, end)*sizeof(BidirIt) bytes of extra space usage
 		//Save the left list in a temp because we'll be overwriting it as we insert
-		using ValueType = typename std::iterator_traits<RandomIt>::value_type;
+		using ValueType = typename std::iterator_traits<BidirIt>::value_type;
 		std::vector<ValueType> tempList(newLeftBegin, middle);
 		auto leftIt = tempList.begin();
 		auto leftEnd = tempList.end();
@@ -133,14 +143,17 @@ namespace MergeSort {
 		MergeInto(leftIt, leftEnd, rightIt, rightEnd, insertIt, Comp);
 	}
 
-	template<class RandomIt, class Compare = std::less<>>
-	void Sort(RandomIt begin, RandomIt end, MergeType mergeType = MergeType::ExtraSpace, Compare Comp = Compare()) {
-		std::function<void(RandomIt,RandomIt,RandomIt,Compare)> MergeFunction;
+	template<class BidirIt, class Compare = std::less<>, typename = std::enable_if_t<std::is_base_of<std::bidirectional_iterator_tag, typename std::iterator_traits<BidirIt>::iterator_category>::value>>
+	//std::distance and std::next require the passed iterator to be an InputIterator
+	//InPlaceMerge requires the passed iterator to be an ForwardIterator
+	//Merge requires the passed iterator to be an BidirectionalIterator
+	void Sort(BidirIt begin, BidirIt end, MergeType mergeType = MergeType::ExtraSpace, Compare Comp = Compare()) {
+		std::function<void(BidirIt,BidirIt,BidirIt,Compare)> MergeFunction;
 		
 		if (mergeType == MergeType::ExtraSpace) {
-			MergeFunction = Merge<RandomIt,Compare>;
+			MergeFunction = Merge<BidirIt,Compare>;
 		} else {
-			MergeFunction = InPlaceMerge<RandomIt,Compare>;
+			MergeFunction = InPlaceMerge<BidirIt,Compare>;
 		}
 
 		size_t length = std::distance(begin,end);
@@ -159,7 +172,7 @@ namespace MergeSort {
 				} else if (endPos >= length) {
 					endPos = length;
 				}
-				MergeFunction(begin+firstPos, begin+middlePos, begin+endPos, Comp);
+				MergeFunction(std::next(begin, firstPos), std::next(begin, middlePos), std::next(begin, endPos), Comp);
 			}
 		}
 	}
